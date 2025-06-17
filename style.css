@@ -227,252 +227,97 @@ body {
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(16, 16, 32, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
 }
 
-/* Enhanced Transaction Light with Vertical Streaming Bands */
-.transaction-light {
-  position: absolute;
-  width: 4px;
-  height: 20px;
-  border-radius: 2px;
-  animation: slideUp 2s ease-out forwards;
-  z-index: 5;
-  overflow: hidden;
+/* Transaction Container */
+.transaction-container {
   position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(16, 16, 32, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
+}
+
+/* Transaction Bars */
+.transaction-bar {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  filter: blur(0px);
+  transition: opacity 0.3s ease, filter 0.3s ease;
+  z-index: 5;
+}
+
+.transaction-bar.small {
   background: linear-gradient(
-    180deg,
+    90deg,
     transparent 0%,
     rgba(255, 0, 128, 0.3) 20%,
-    rgba(255, 0, 128, 1) 50%,
+    rgba(255, 0, 128, 0.8) 50%,
     rgba(255, 0, 128, 0.3) 80%,
     transparent 100%
   );
-  box-shadow: 0 0 10px rgba(255, 0, 128, 0.8), 0 0 20px rgba(255, 0, 128, 0.4);
+  box-shadow: 0 0 8px rgba(255, 0, 128, 0.4);
 }
 
-.transaction-light .light-slide {
-  position: absolute;
-  top: -100%;
-  left: -100%;
-  width: 400%;
-  height: 400%;
+.transaction-bar.medium {
   background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 20%,
-    rgba(255, 255, 255, 0.2) 35%,
-    rgba(255, 255, 255, 0.8) 50%,
-    rgba(255, 255, 255, 0.2) 65%,
-    rgba(255, 255, 255, 0) 80%
-  );
-  animation: slide-light 3s ease-in-out infinite;
-  transform: rotate(25deg);
-  z-index: 2;
-  filter: blur(1px);
-}
-
-.transaction-light.medium .light-slide {
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 20%,
-    rgba(255, 255, 255, 0.3) 35%,
-    rgba(255, 255, 255, 0.9) 50%,
-    rgba(255, 255, 255, 0.3) 65%,
-    rgba(255, 255, 255, 0) 80%
-  );
-  filter: blur(1.5px);
-}
-
-.transaction-light.large .light-slide {
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 15%,
-    rgba(255, 255, 255, 0.4) 30%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, 0.4) 70%,
-    rgba(255, 255, 255, 0) 85%
-  );
-  filter: blur(2px);
-  animation: slide-light 2.5s ease-in-out infinite;
-}
-
-.transaction-light.supernova .light-slide {
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 10%,
-    rgba(255, 255, 255, 0.5) 25%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, 0.5) 75%,
-    rgba(255, 255, 255, 0) 90%
-  );
-  filter: blur(3px) brightness(1.2);
-  animation: slide-light 2s ease-in-out infinite;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-}
-
-@keyframes slide-light {
-  0% {
-    transform: translateX(-150%) rotate(25deg);
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  85% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(150%) rotate(25deg);
-    opacity: 0;
-  }
-}
-
-.transaction-light::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 300%;
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.8) 0px,
-    rgba(255, 255, 255, 0.2) 8px,
-    rgba(255, 255, 255, 0) 16px,
-    rgba(255, 255, 255, 0.2) 24px,
-    rgba(255, 255, 255, 0.8) 32px
-  );
-  animation: streamingBands 1.5s linear infinite;
-  opacity: 0.7;
-}
-
-.transaction-light.medium {
-  width: 6px;
-  height: 30px;
-  background: linear-gradient(
-    180deg,
+    90deg,
     transparent 0%,
-    rgba(128, 0, 255, 0.3) 20%,
-    rgba(128, 0, 255, 1) 50%,
-    rgba(128, 0, 255, 0.3) 80%,
+    rgba(128, 0, 255, 0.4) 20%,
+    rgba(128, 0, 255, 0.9) 50%,
+    rgba(128, 0, 255, 0.4) 80%,
     transparent 100%
   );
-  box-shadow: 0 0 15px rgba(128, 0, 255, 0.8), 0 0 30px rgba(128, 0, 255, 0.4);
+  box-shadow: 0 0 12px rgba(128, 0, 255, 0.5);
 }
 
-.transaction-light.medium::before {
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.9) 0px,
-    rgba(255, 255, 255, 0.3) 10px,
-    rgba(255, 255, 255, 0) 20px,
-    rgba(255, 255, 255, 0.3) 30px,
-    rgba(255, 255, 255, 0.9) 40px
-  );
-  animation: streamingBands 1.2s linear infinite;
-}
-
-.transaction-light.large {
-  width: 8px;
-  height: 40px;
+.transaction-bar.large {
   background: linear-gradient(
-    180deg,
+    90deg,
     transparent 0%,
-    rgba(0, 128, 255, 0.3) 20%,
+    rgba(0, 128, 255, 0.5) 20%,
     rgba(0, 128, 255, 1) 50%,
-    rgba(0, 128, 255, 0.3) 80%,
+    rgba(0, 128, 255, 0.5) 80%,
     transparent 100%
   );
-  box-shadow: 0 0 20px rgba(0, 128, 255, 0.8), 0 0 40px rgba(0, 128, 255, 0.4);
+  box-shadow: 0 0 16px rgba(0, 128, 255, 0.6);
 }
 
-.transaction-light.large::before {
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 1) 0px,
-    rgba(255, 255, 255, 0.4) 12px,
-    rgba(255, 255, 255, 0) 24px,
-    rgba(255, 255, 255, 0.4) 36px,
-    rgba(255, 255, 255, 1) 48px
-  );
-  animation: streamingBands 1s linear infinite;
-}
-
-.transaction-light.supernova {
-  width: 12px;
-  height: 60px;
+.transaction-bar.supernova {
   background: linear-gradient(
-    180deg,
+    90deg,
     transparent 0%,
-    rgba(0, 255, 255, 0.4) 15%,
+    rgba(0, 255, 255, 0.6) 15%,
     rgba(255, 255, 255, 1) 50%,
-    rgba(0, 255, 255, 0.4) 85%,
+    rgba(0, 255, 255, 0.6) 85%,
     transparent 100%
   );
-  box-shadow: 0 0 30px rgba(0, 255, 255, 1), 0 0 60px rgba(0, 255, 255, 0.6), 0 0 90px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.4);
+  height: 3px;
 }
 
-.transaction-light.supernova::before {
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 1) 0px,
-    rgba(255, 255, 255, 0.6) 6px,
-    rgba(255, 255, 255, 0.2) 12px,
-    rgba(255, 255, 255, 0.6) 18px,
-    rgba(255, 255, 255, 1) 24px
-  );
-  animation: streamingBands 0.8s linear infinite;
-  opacity: 0.9;
+/* Glow Animation States */
+.transaction-bar.glowing {
+  opacity: 1;
+  filter: blur(2px);
 }
 
-@keyframes streamingBands {
-  0% {
-    transform: translateY(-100%);
-  }
-  100% {
-    transform: translateY(0%);
-  }
+.transaction-bar.sliding {
+  transition: transform 2s ease-out, opacity 2s ease-out;
+  transform: translateY(-120vh);
+  opacity: 0;
 }
 
-@keyframes slideUp {
-  0% {
-    bottom: -50px;
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  10% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  90% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  100% {
-    bottom: calc(100% + 50px);
-    opacity: 0;
-    transform: scale(0.8);
-  }
-}
-
-/* Vertical lanes for transaction lights */
-.transaction-lanes {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: space-evenly;
-  pointer-events: none;
-  z-index: 1;
-}
-
+/* Remove the old transaction light styles */
+.transaction-light,
+.transaction-lanes,
 .transaction-lane {
-  position: relative;
-  width: 2px;
-  height: 100%;
-  background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
-  opacity: 0.3;
+  display: none;
 }
 
+/* Stats Overlay */
 .stats-overlay {
   position: absolute;
   top: 2rem;

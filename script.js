@@ -20,12 +20,7 @@ class MonadVisualizer {
   init() {
     this.setupEventListeners()
     this.initializeDerby()
-    this.initializeTransactionLanes()
     this.startSimulations()
-  }
-
-  initializeTransactionLanes() {
-    this.transactionLanes = document.querySelectorAll(".transaction-lane")
   }
 
   setupEventListeners() {
@@ -87,19 +82,70 @@ class MonadVisualizer {
   }
 
   simulateDataStream() {
-    const createTransaction = () => {
-      const transactionTypes = ["small", "medium", "large", "supernova"]
-      const weights = [0.6, 0.25, 0.12, 0.03]
+    const createBurst = () => {
+      if (this.currentTab === "cityscape") {
+        // Randomize 6-10 bars per burst
+        const burstSize = 6 + Math.floor(Math.random() * 5)
+        this.burst(burstSize)
+      }
+    }
 
+    const scheduleNextBurst = () => {
+      const delay = Math.random() * 400 + 400 // 400-800ms intervals
+      setTimeout(() => {
+        createBurst()
+        scheduleNextBurst()
+      }, delay)
+    }
+
+    scheduleNextBurst()
+  }
+
+  createTransactionBar(transaction, yOffset = 0) {
+    const container = document.querySelector(".transaction-container")
+    if (!container) return
+
+    const bar = document.createElement("div")
+    bar.classList.add("transaction-bar", transaction.type)
+
+    const initialY = container.clientHeight + yOffset
+    bar.style.top = `${initialY}px`
+
+    container.appendChild(bar)
+
+    // Animate into glowing and sliding
+    requestAnimationFrame(() => {
+      bar.classList.add("glowing")
+
+      // Start sliding after brief glow
+      setTimeout(() => {
+        bar.classList.add("sliding")
+      }, 100)
+    })
+
+    // Remove after animation ends
+    setTimeout(() => {
+      if (bar.parentNode) {
+        bar.parentNode.removeChild(bar)
+      }
+    }, 2500)
+  }
+
+  burst(count = 8) {
+    const transactionTypes = ["small", "medium", "large", "supernova"]
+    const weights = [0.6, 0.25, 0.12, 0.03]
+
+    for (let i = 0; i < count; i++) {
+      // Determine transaction type
       let random = Math.random()
       let type = "small"
 
-      for (let i = 0; i < weights.length; i++) {
-        if (random < weights[i]) {
-          type = transactionTypes[i]
+      for (let j = 0; j < weights.length; j++) {
+        if (random < weights[j]) {
+          type = transactionTypes[j]
           break
         }
-        random -= weights[i]
+        random -= weights[j]
       }
 
       const transaction = {
@@ -110,60 +156,13 @@ class MonadVisualizer {
         type: type,
       }
 
-      // Create sliding light animation
-      if (this.currentTab === "cityscape") {
-        this.createTransactionLight(transaction)
-      }
-
-      // Add to data feed
-      this.addToDataFeed(transaction)
-
-      this.transactionCount++
-    }
-
-    const scheduleNextTransaction = () => {
-      const delay = Math.random() * 300 + 150 // 150-450ms intervals
+      // Offset small variations to simulate natural flow
       setTimeout(() => {
-        createTransaction()
-        scheduleNextTransaction()
-      }, delay)
+        this.createTransactionBar(transaction, i * 2)
+        this.addToDataFeed(transaction)
+        this.transactionCount++
+      }, i * 30)
     }
-
-    scheduleNextTransaction()
-  }
-
-  createTransactionLight(transaction) {
-    if (this.transactionLanes.length === 0) return
-
-    // Choose a random lane
-    const laneIndex = Math.floor(Math.random() * this.transactionLanes.length)
-    const lane = this.transactionLanes[laneIndex]
-
-    // Create the light element
-    const light = document.createElement("div")
-    light.className = `transaction-light ${transaction.type}`
-
-    // Position the light at the bottom of the chosen lane
-    const laneRect = lane.getBoundingClientRect()
-    const containerRect = lane.closest(".data-stream-container").getBoundingClientRect()
-
-    light.style.left = laneRect.left - containerRect.left + laneRect.width / 2 - 2 + "px"
-    light.style.bottom = "-50px"
-
-    // Add slight random horizontal offset for variety
-    const randomOffset = (Math.random() - 0.5) * 20
-    light.style.transform = `translateX(${randomOffset}px)`
-
-    // Add to container
-    const container = document.querySelector(".data-stream-container")
-    container.appendChild(light)
-
-    // Remove the light after animation completes
-    setTimeout(() => {
-      if (light.parentNode) {
-        light.parentNode.removeChild(light)
-      }
-    }, 2000)
   }
 
   addToDataFeed(transaction) {
