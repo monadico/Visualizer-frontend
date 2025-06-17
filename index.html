@@ -1,352 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monad Super-Visualizer</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/glass-effects.css">
-    <link rel="stylesheet" href="styles/animations.css">
-    <link rel="stylesheet" href="styles/gmunk-stream.css">
-    <link rel="stylesheet" href="styles/components.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monad Super-Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Advanced SVG Filters -->
-    <svg class="svg-filters">
-        <defs>
-            <!-- Gmunk-style Glow Filter -->
-            <filter id="gmunk-glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge> 
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-            </filter>
+  <!-- Background Elements -->
+  <div class="background-gradient"></div>
+  <div class="background-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
 
-            <!-- Data Stream Blur -->
-            <filter id="stream-blur" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="1.5" result="blur"/>
-                <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 0 1 0 0  0 0 0 1 0  0 0 0 1 0"/>
-            </filter>
+  <!-- Main App Container -->
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header glass-panel">
+      <div class="logo">
+        <div class="logo-icon">M</div>
+        <h1>Monad Super-Visualizer</h1>
+      </div>
+      <nav class="nav-tabs">
+        <button class="tab-button active" data-tab="cityscape">
+          <span class="tab-icon">✨</span>
+          <span>Data Stream</span>
+        </button>
+        <button class="tab-button" data-tab="derby">
+          <span class="tab-icon">🏁</span>
+          <span>Perpetual Derby</span>
+        </button>
+        <button class="tab-button" data-tab="dashboard">
+          <span class="tab-icon">📊</span>
+          <span>Dashboard</span>
+        </button>
+      </nav>
+    </header>
 
-            <!-- Liquid Glass Distortion -->
-            <filter id="liquid-glass" x="-50%" y="-50%" width="200%" height="200%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="3" result="noise"/>
-                <feGaussianBlur in="noise" stdDeviation="1.5" result="blurred"/>
-                <feDisplacementMap in="SourceGraphic" in2="blurred" scale="8" xChannelSelector="R" yChannelSelector="G"/>
-                <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="softened"/>
-                <feComposite in="softened" in2="SourceGraphic" operator="multiply"/>
-            </filter>
-
-            <!-- Gradient Definitions -->
-            <linearGradient id="data-stream-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1"/>
-                <stop offset="50%" style="stop-color:#8000ff;stop-opacity:0.8"/>
-                <stop offset="100%" style="stop-color:#0080ff;stop-opacity:0.6"/>
-            </linearGradient>
-
-            <linearGradient id="activity-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:#00ffff;stop-opacity:1"/>
-                <stop offset="100%" style="stop-color:#0080ff;stop-opacity:0.3"/>
-            </linearGradient>
-        </defs>
-    </svg>
-
-    <!-- Particle System Canvas -->
-    <canvas id="particle-canvas" class="particle-canvas"></canvas>
-
-    <!-- Liquid Background Layers -->
-    <div class="liquid-background">
-        <div class="liquid-layer liquid-layer-1"></div>
-        <div class="liquid-layer liquid-layer-2"></div>
-        <div class="liquid-layer liquid-layer-3"></div>
-        <div class="liquid-layer liquid-layer-4"></div>
-    </div>
-
-    <!-- Main App Container -->
-    <div class="app-container">
-        <!-- Advanced Glass Header -->
-        <header class="header ultra-glass">
-            <div class="glass-content">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <div class="logo-inner">M</div>
-                        <div class="logo-glow"></div>
-                    </div>
-                    <h1 class="logo-text">Monad Super-Visualizer</h1>
-                </div>
-                <nav class="nav-tabs">
-                    <button class="tab-button active" data-tab="datastream">
-                        <span class="tab-icon">📊</span>
-                        <span class="tab-text">Data Stream</span>
-                        <div class="tab-glow"></div>
-                    </button>
-                    <button class="tab-button" data-tab="derby">
-                        <span class="tab-icon">🏁</span>
-                        <span class="tab-text">Perpetual Derby</span>
-                        <div class="tab-glow"></div>
-                    </button>
-                    <button class="tab-button" data-tab="dashboard">
-                        <span class="tab-icon">📈</span>
-                        <span class="tab-text">Dashboard</span>
-                        <div class="tab-glow"></div>
-                    </button>
-                </nav>
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Data Stream Page (replacing Galaxy Firehose) -->
+      <div id="cityscape" class="page active">
+        <div class="data-stream-container glass-panel">
+          <!-- Stats Overlay -->
+          <div class="stats-overlay glass-panel">
+            <div class="stat">
+              <span class="stat-label">Live TPS</span>
+              <span class="stat-value" id="liveTps">0</span>
             </div>
-            <div class="header-reflection"></div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Gmunk-Style Data Stream Page -->
-            <div id="datastream" class="page active">
-                <div class="gmunk-container ultra-glass">
-                    <div class="glass-content">
-                        <!-- Stats Panels -->
-                        <div class="stats-grid">
-                            <div class="stat-panel ultra-glass">
-                                <div class="glass-content">
-                                    <div class="stat-header">
-                                        <span class="stat-icon">🔀</span>
-                                        <span class="stat-label">Active Contracts</span>
-                                    </div>
-                                    <div class="stat-value" id="activeContracts">349</div>
-                                    <div class="stat-subtitle">Last 10 min</div>
-                                </div>
-                            </div>
-
-                            <div class="stat-panel ultra-glass">
-                                <div class="glass-content">
-                                    <div class="stat-header">
-                                        <span class="stat-icon">⚡</span>
-                                        <span class="stat-label">Activity Today</span>
-                                    </div>
-                                    <div class="stat-value" id="activityToday">19,550</div>
-                                    <div class="stat-subtitle">Last 10 min</div>
-                                </div>
-                            </div>
-
-                            <div class="stat-panel ultra-glass">
-                                <div class="glass-content">
-                                    <div class="stat-header">
-                                        <span class="stat-icon">👥</span>
-                                        <span class="stat-label">Active Users</span>
-                                    </div>
-                                    <div class="stat-value" id="activeUsers">3,643</div>
-                                    <div class="stat-subtitle">Last 30 min</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Main Data Stream Visualization -->
-                        <div class="data-stream-container">
-                            <canvas id="gmunk-canvas" class="gmunk-canvas"></canvas>
-                            <div class="stream-overlay">
-                                <div class="stream-stats">
-                                    <div class="live-indicator">
-                                        <div class="pulse-dot"></div>
-                                        <span>LIVE</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Bottom Stats Row -->
-                        <div class="bottom-stats">
-                            <div class="bottom-stat-panel ultra-glass">
-                                <div class="glass-content">
-                                    <div class="stat-header">
-                                        <span class="stat-label">Gas Used/Saved</span>
-                                    </div>
-                                    <div class="stat-value" id="gasMetrics">16,895m</div>
-                                    <div class="contribution-mini-graph" id="contributionGraph"></div>
-                                </div>
-                            </div>
-
-                            <div class="bottom-stat-panel ultra-glass">
-                                <div class="glass-content">
-                                    <div class="stat-header">
-                                        <span class="stat-label">Transaction Flow</span>
-                                    </div>
-                                    <div class="flow-visualization" id="flowViz"></div>
-                                </div>
-                            </div>
-
-                            <div class="bottom-stat-panel ultra-glass">
-                                <div class="glass-content">
-                                    <div class="stat-header">
-                                        <span class="stat-label">Network Participants</span>
-                                    </div>
-                                    <div class="stat-value" id="participants">3,643</div>
-                                    <div class="user-avatars" id="userAvatars"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Real-time Data Feed -->
-                        <div class="data-feed ultra-glass">
-                            <div class="glass-content">
-                                <div class="feed-header">
-                                    <span class="feed-title">Data Stream</span>
-                                    <span class="feed-status">REAL TIME</span>
-                                </div>
-                                <div class="feed-content" id="dataFeed">
-                                    <!-- Real-time data will be populated here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="stat">
+              <span class="stat-label">Total Transactions</span>
+              <span class="stat-value" id="totalTx">0</span>
             </div>
+          </div>
 
-            <!-- Derby Page -->
-            <div id="derby" class="page">
-                <div class="derby-container">
-                    <!-- Advanced Scoreboard -->
-                    <div class="scoreboard ultra-glass">
-                        <div class="glass-content">
-                            <div class="scoreboard-header">
-                                <h2 class="section-title">Race Leaderboard</h2>
-                                <button class="config-button glass-button" id="configButton">
-                                    <span class="button-icon">⚙️</span>
-                                    <span class="button-text">Configure Race</span>
-                                    <div class="button-glow"></div>
-                                </button>
-                            </div>
-                            <div class="scoreboard-content" id="scoreboardContent">
-                                <!-- Dynamic content -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Advanced Racetrack -->
-                    <div class="racetrack-container ultra-glass">
-                        <div class="glass-content">
-                            <div class="racetrack" id="racetrack">
-                                <!-- Dynamic lanes -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Configuration Modal -->
-                <div class="modal-overlay" id="configModal">
-                    <div class="modal ultra-glass">
-                        <div class="glass-content">
-                            <div class="modal-header">
-                                <h3 class="modal-title">Configure Race</h3>
-                                <button class="close-button glass-button" id="closeModal">
-                                    <span>×</span>
-                                    <div class="button-glow"></div>
-                                </button>
-                            </div>
-                            <div class="modal-content">
-                                <div class="config-section">
-                                    <label class="section-label">Entity Configuration:</label>
-                                    <div class="input-row">
-                                        <div class="input-group">
-                                            <label for="entityName" class="input-label">Entity Name</label>
-                                            <input type="text" id="entityName" placeholder="e.g., Uniswap V3" class="glass-input">
-                                            <div class="input-glow"></div>
-                                        </div>
-                                        <div class="input-group">
-                                            <label for="entityAddresses" class="input-label">Blockchain Address(es)</label>
-                                            <input type="text" id="entityAddresses" placeholder="0x1f9840a85d5af5bf1d1762f925bdaddc4201f984, 0x..." class="glass-input">
-                                            <div class="input-glow"></div>
-                                        </div>
-                                    </div>
-                                    <div class="monitoring-options">
-                                        <label class="section-label">Monitoring Direction:</label>
-                                        <div class="radio-group">
-                                            <div class="radio-item glass-radio">
-                                                <input type="radio" id="toAddress" name="monitoring" value="to" checked>
-                                                <label for="toAddress">To the specified address(es)</label>
-                                                <div class="radio-glow"></div>
-                                            </div>
-                                            <div class="radio-item glass-radio">
-                                                <input type="radio" id="fromAddress" name="monitoring" value="from">
-                                                <label for="fromAddress">From the specified address(es)</label>
-                                                <div class="radio-glow"></div>
-                                            </div>
-                                            <div class="radio-item glass-radio">
-                                                <input type="radio" id="bothDirections" name="monitoring" value="both">
-                                                <label for="bothDirections">Both directions</label>
-                                                <div class="radio-glow"></div>
-                                            </div>
-                                            <div class="radio-item glass-radio">
-                                                <input type="radio" id="contractDeployed" name="monitoring" value="deployed">
-                                                <label for="contractDeployed">All transactions to contracts deployed by the specified address</label>
-                                                <div class="radio-glow"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="config-section">
-                                    <label class="section-label">Current Racing Entities:</label>
-                                    <div class="current-entities ultra-glass" id="currentEntities">
-                                        <!-- Dynamic content -->
-                                    </div>
-                                </div>
-                                <div class="config-actions">
-                                    <button class="glass-button secondary" id="resetConfig">
-                                        <span>Reset to Default</span>
-                                        <div class="button-glow"></div>
-                                    </button>
-                                    <button class="glass-button primary" id="addEntity">
-                                        <span>Add Entity</span>
-                                        <div class="button-glow"></div>
-                                    </button>
-                                    <button class="glass-button primary" id="applyConfig">
-                                        <span>Apply Configuration</span>
-                                        <div class="button-glow"></div>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          <!-- Main Gmunk Canvas -->
+          <canvas id="gmunk-canvas" class="gmunk-canvas"></canvas>
+          
+          <!-- Data Feed -->
+          <div class="data-feed glass-panel">
+            <div class="feed-header">
+              <span>Data Stream</span>
+              <span class="live-indicator">LIVE</span>
             </div>
+            <div class="feed-content" id="dataFeed"></div>
+          </div>
+        </div>
+      </div>
 
-            <!-- Dashboard Page -->
-            <div id="dashboard" class="page">
-                <div class="dashboard-container">
-                    <div class="placeholder-panel ultra-glass">
-                        <div class="glass-content">
-                            <div class="placeholder-content">
-                                <div class="placeholder-icon">📊</div>
-                                <h2 class="placeholder-title">Historical Data Dashboard</h2>
-                                <p class="placeholder-subtitle">Coming Soon!</p>
-                                <div class="placeholder-features">
-                                    <div class="feature-item ultra-glass">
-                                        <span class="feature-icon">📈</span>
-                                        <span>Advanced Analytics</span>
-                                    </div>
-                                    <div class="feature-item ultra-glass">
-                                        <span class="feature-icon">🔍</span>
-                                        <span>Deep Insights</span>
-                                    </div>
-                                    <div class="feature-item ultra-glass">
-                                        <span class="feature-icon">📋</span>
-                                        <span>Custom Reports</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <!-- Derby Page -->
+      <div id="derby" class="page">
+        <div class="derby-container">
+          <div class="scoreboard glass-panel">
+            <div class="scoreboard-header">
+              <h2>Race Leaderboard</h2>
+              <button class="config-button" id="configButton">⚙️ Configure Race</button>
             </div>
-        </main>
-    </div>
+            <div class="scoreboard-content" id="scoreboardContent"></div>
+          </div>
 
-    <!-- Scripts -->
-    <script src="js/utils/performance.js"></script>
-    <script src="js/utils/math.js"></script>
-    <script src="js/effects/particles.js"></script>
-    <script src="js/effects/liquid-glass.js"></script>
-    <script src="js/components/gmunk-stream.js"></script>
-    <script src="js/main.js"></script>
+          <div class="racetrack-container glass-panel">
+            <div class="racetrack" id="racetrack"></div>
+          </div>
+        </div>
+
+        <!-- Configuration Modal -->
+        <div class="modal-overlay" id="configModal">
+          <div class="modal glass-panel">
+            <div class="modal-header">
+              <h3>Configure Race</h3>
+              <button class="close-button" id="closeModal">×</button>
+            </div>
+            <div class="modal-content">
+              <div class="config-section">
+                <label>Entity Configuration:</label>
+                <div class="input-row">
+                  <div class="input-group">
+                    <label for="entityName">Entity Name</label>
+                    <input type="text" id="entityName" placeholder="e.g., Uniswap V3" class="glass-input">
+                  </div>
+                  <div class="input-group">
+                    <label for="entityAddresses">Blockchain Address(es)</label>
+                    <input type="text" id="entityAddresses" placeholder="0x1f9840a85d5af5bf1d1762f925bdaddc4201f984, 0x..." class="glass-input">
+                  </div>
+                </div>
+                <div class="monitoring-options">
+                  <label>Monitoring Direction:</label>
+                  <div class="radio-group">
+                    <div class="radio-item">
+                      <input type="radio" id="toAddress" name="monitoring" value="to" checked>
+                      <label for="toAddress">To the specified address(es)</label>
+                    </div>
+                    <div class="radio-item">
+                      <input type="radio" id="fromAddress" name="monitoring" value="from">
+                      <label for="fromAddress">From the specified address(es)</label>
+                    </div>
+                    <div class="radio-item">
+                      <input type="radio" id="bothDirections" name="monitoring" value="both">
+                      <label for="bothDirections">Both directions</label>
+                    </div>
+                    <div class="radio-item">
+                      <input type="radio" id="contractDeployed" name="monitoring" value="deployed">
+                      <label for="contractDeployed">All transactions to contracts deployed by the specified address</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="config-section">
+                <label>Current Racing Entities:</label>
+                <div class="current-entities" id="currentEntities"></div>
+              </div>
+              <div class="config-actions">
+                <button class="btn-secondary" id="resetConfig">Reset to Default</button>
+                <button class="btn-primary" id="addEntity">Add Entity</button>
+                <button class="btn-primary" id="applyConfig">Apply Configuration</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Page -->
+      <div id="dashboard" class="page">
+        <div class="dashboard-container">
+          <div class="placeholder-panel glass-panel">
+            <div class="placeholder-content">
+              <div class="placeholder-icon">📊</div>
+              <h2>Historical Data Dashboard</h2>
+              <p>Coming Soon!</p>
+              <div class="placeholder-features">
+                <div class="feature">📈 Advanced Analytics</div>
+                <div class="feature">🔍 Deep Insights</div>
+                <div class="feature">📋 Custom Reports</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

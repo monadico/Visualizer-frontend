@@ -10,18 +10,25 @@ class MonadVisualizer {
     this.racerPositions = {}
     this.racerData = {}
 
+    // Gmunk stream instance
+    this.gmunkStream = null
+
     this.init()
     window.visualizer = this
-
-    // Expose method for external image loading
-    window.setMoonCharacter = (imageUrl) => this.setMoonCharacter(imageUrl)
   }
 
   init() {
     this.setupEventListeners()
     this.initializeDerby()
-    this.startCityscapeSimulation()
-    this.startDerbySimulation()
+    this.initializeGmunkStream()
+    this.startSimulations()
+  }
+
+  initializeGmunkStream() {
+    const canvas = document.getElementById("gmunk-canvas")
+    if (canvas) {
+      this.gmunkStream = new GmunkDataStream(canvas)
+    }
   }
 
   setupEventListeners() {
@@ -49,14 +56,12 @@ class MonadVisualizer {
       this.resetConfiguration()
     })
 
-    // Close modal on overlay click
     document.getElementById("configModal").addEventListener("click", (e) => {
       if (e.target.id === "configModal") {
         this.closeConfigModal()
       }
     })
 
-    // Add this after the existing derby configuration listeners:
     document.getElementById("addEntity").addEventListener("click", () => {
       this.addEntity()
     })
@@ -78,144 +83,81 @@ class MonadVisualizer {
     this.currentTab = tabName
   }
 
-  // Cityscape Firehose Implementation
-  startCityscapeSimulation() {
-    this.simulateTransactionStream()
-    this.spawnMonanimal()
+  startSimulations() {
+    this.simulateDataStream()
     this.updateStats()
+    this.startDerbySimulation()
   }
 
-  simulateTransactionStream() {
-    const starsContainer = document.getElementById("starsContainer")
+  simulateDataStream() {
+    const createTransaction = () => {
+      const transactionTypes = ["small", "medium", "large", "supernova"]
+      const weights = [0.5, 0.3, 0.15, 0.05]
 
-    const createStar = () => {
-      const star = document.createElement("div")
+      let random = Math.random()
+      let type = "small"
 
-      // Random star type based on transaction value/importance
-      const rand = Math.random()
-      if (rand < 0.5) {
-        star.className = "star small"
-      } else if (rand < 0.8) {
-        star.className = "star medium"
-      } else if (rand < 0.95) {
-        star.className = "star large"
-      } else {
-        star.className = "star supernova"
+      for (let i = 0; i < weights.length; i++) {
+        if (random < weights[i]) {
+          type = transactionTypes[i]
+          break
+        }
+        random -= weights[i]
       }
 
-      // Random position avoiding the center moon area
-      let x, y
-      do {
-        x = Math.random() * 100
-        y = Math.random() * 100
-      } while (this.isInMoonArea(x, y))
+      const transaction = {
+        hash: "0x" + Math.random().toString(16).substr(2, 16),
+        from: "0x" + Math.random().toString(16).substr(2, 8) + "...",
+        to: "0x" + Math.random().toString(16).substr(2, 8) + "...",
+        value: (Math.random() * 100).toFixed(4),
+        type: type,
+      }
 
-      star.style.left = x + "%"
-      star.style.top = y + "%"
+      // Add to gmunk stream
+      if (this.gmunkStream && this.currentTab === "cityscape") {
+        this.gmunkStream.addTransaction(transaction)
+      }
 
-      starsContainer.appendChild(star)
-
-      // Remove after animation with performance optimization
-      setTimeout(() => {
-        if (star.parentNode) {
-          star.parentNode.removeChild(star)
-        }
-      }, 1200)
+      // Add to data feed
+      this.addToDataFeed(transaction)
 
       this.transactionCount++
     }
 
-    // Check if position is in moon area to avoid overlap
-    this.isInMoonArea = (x, y) => {
-      const centerX = 50
-      const centerY = 50
-      const moonRadius = 15 // Percentage of screen
-      const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
-      return distance < moonRadius
-    }
-
-    // Variable rate transaction simulation with performance throttling
-    const scheduleNextStar = () => {
-      const delay = Math.random() * 150 + 75 // 75-225ms for better performance
+    const scheduleNextTransaction = () => {
+      const delay = Math.random() * 400 + 100
       setTimeout(() => {
-        createStar()
-        scheduleNextStar()
+        createTransaction()
+        scheduleNextTransaction()
       }, delay)
     }
 
-    scheduleNextStar()
-
-    // Add moon click interaction
-    document.getElementById("centralMoon").addEventListener("click", () => {
-      this.createMoonBurst()
-    })
+    scheduleNextTransaction()
   }
 
-  createMoonBurst() {
-    const starsContainer = document.getElementById("starsContainer")
+  addToDataFeed(transaction) {
+    const feedContent = document.getElementById("dataFeed")
+    if (!feedContent) return
 
-    // Create burst of stars from moon center
-    for (let i = 0; i < 16; i++) {
-      setTimeout(() => {
-        const star = document.createElement("div")
-        star.className = "star large"
+    const timestamp = new Date().toLocaleTimeString()
+    const feedItem = document.createElement("div")
+    feedItem.className = "feed-item"
+    feedItem.innerHTML = `
+      <div class="timestamp">${timestamp}</div>
+      <div class="action">Transaction ${transaction.hash.substring(0, 8)}...</div>
+      <div class="details">${transaction.from} → ${transaction.to} (${transaction.value} ETH)</div>
+    `
 
-        // Position in a circle around moon center
-        const angle = (i / 16) * 2 * Math.PI
-        const distance = 20 + Math.random() * 15 // Distance from center
-        const x = 50 + Math.cos(angle) * distance
-        const y = 50 + Math.sin(angle) * distance
+    feedContent.insertBefore(feedItem, feedContent.firstChild)
 
-        star.style.left = Math.max(0, Math.min(100, x)) + "%"
-        star.style.top = Math.max(0, Math.min(100, y)) + "%"
-
-        starsContainer.appendChild(star)
-
-        setTimeout(() => {
-          if (star.parentNode) {
-            star.parentNode.removeChild(star)
-          }
-        }, 1200)
-      }, i * 30)
+    // Remove old items
+    while (feedContent.children.length > 50) {
+      feedContent.removeChild(feedContent.lastChild)
     }
-  }
-
-  spawnMonanimal() {
-    const container = document.getElementById("monanimalsContainer")
-
-    const createMonanimal = () => {
-      const monanimal = document.createElement("div")
-      monanimal.className = "monanimal"
-
-      // Random vertical position
-      monanimal.style.top = Math.random() * 80 + 10 + "%"
-      monanimal.style.left = "-50px"
-
-      container.appendChild(monanimal)
-
-      // Remove after animation
-      setTimeout(() => {
-        if (monanimal.parentNode) {
-          monanimal.parentNode.removeChild(monanimal)
-        }
-      }, 15000)
-    }
-
-    // Spawn Monanimal every 8-15 seconds
-    const scheduleNextMonanimal = () => {
-      const delay = Math.random() * 7000 + 8000
-      setTimeout(() => {
-        createMonanimal()
-        scheduleNextMonanimal()
-      }, delay)
-    }
-
-    scheduleNextMonanimal()
   }
 
   updateStats() {
     const updateTps = () => {
-      // Simulate TPS fluctuation
       this.currentTps = Math.floor(Math.random() * 5000 + 1000)
       document.getElementById("liveTps").textContent = this.currentTps.toLocaleString()
       document.getElementById("totalTx").textContent = this.transactionCount.toLocaleString()
@@ -225,7 +167,7 @@ class MonadVisualizer {
     setInterval(updateTps, 1000)
   }
 
-  // Derby Implementation
+  // Derby Implementation (keeping original)
   initializeDerby() {
     this.updateCurrentEntities()
     this.setupRacetrack()
@@ -277,7 +219,6 @@ class MonadVisualizer {
       monitoring: monitoringOption.value,
     }
 
-    // Check if entity already exists
     const exists = this.derbyConfig.entities.some((entity) => (entity.name || entity) === name)
 
     if (exists) {
@@ -288,7 +229,6 @@ class MonadVisualizer {
     this.derbyConfig.entities.push(newEntity)
     this.updateCurrentEntities()
 
-    // Clear inputs
     nameInput.value = ""
     addressInput.value = ""
     document.getElementById("toAddress").checked = true
@@ -309,7 +249,6 @@ class MonadVisualizer {
       `
       racetrack.appendChild(lane)
 
-      // Initialize racer position and data
       this.racerPositions[entityName] = 0
       this.racerData[entityName] = {
         tps: Math.floor(Math.random() * 1000 + 100),
@@ -323,7 +262,6 @@ class MonadVisualizer {
     const content = document.getElementById("scoreboardContent")
     content.innerHTML = ""
 
-    // Sort entities by TPS for leaderboard
     const sortedEntities = [...this.derbyConfig.entities].sort((a, b) => this.racerData[b].tps - this.racerData[a].tps)
 
     sortedEntities.forEach((entity, index) => {
@@ -331,15 +269,15 @@ class MonadVisualizer {
       const card = document.createElement("div")
       card.className = "racer-card"
       card.innerHTML = `
-                <div class="racer-name">#${index + 1} ${entity}</div>
-                <div class="racer-stats">
-                    <span>TPS: ${data.tps}</span>
-                    <span>Laps: ${data.laps}</span>
-                </div>
-                <div style="font-size: 0.7rem; opacity: 0.6; margin-top: 0.5rem;">
-                    ${data.hash}
-                </div>
-            `
+        <div class="racer-name">#${index + 1} ${entity}</div>
+        <div class="racer-stats">
+          <span>TPS: ${data.tps}</span>
+          <span>Laps: ${data.laps}</span>
+        </div>
+        <div style="font-size: 0.7rem; opacity: 0.6; margin-top: 0.5rem;">
+          ${data.hash}
+        </div>
+      `
       content.appendChild(card)
     })
   }
@@ -347,22 +285,18 @@ class MonadVisualizer {
   startDerbySimulation() {
     const updateRace = () => {
       this.derbyConfig.entities.forEach((entity) => {
-        // Update TPS with some variation
         const variation = (Math.random() - 0.5) * 200
         this.racerData[entity].tps = Math.max(50, Math.floor(this.racerData[entity].tps + variation))
 
-        // Update position based on TPS
-        const speed = this.racerData[entity].tps / 10000 // Normalize speed
+        const speed = this.racerData[entity].tps / 10000
         this.racerPositions[entity] += speed
 
-        // Check for lap completion
         if (this.racerPositions[entity] >= 1) {
           this.racerPositions[entity] = 0
           this.racerData[entity].laps++
           this.racerData[entity].hash = this.generateRandomHash()
         }
 
-        // Update racer visual position
         const racerElement = document.getElementById(`racer-${entity}`)
         if (racerElement) {
           const trackWidth = racerElement.parentElement.offsetWidth - 40
@@ -374,7 +308,6 @@ class MonadVisualizer {
       this.updateScoreboard()
     }
 
-    // Update race every 100ms for smooth animation
     setInterval(updateRace, 100)
   }
 
@@ -392,20 +325,6 @@ class MonadVisualizer {
   }
 
   applyConfiguration() {
-    const checkboxes = document.querySelectorAll('#entityCheckboxes input[type="checkbox"]')
-    const selectedEntities = Array.from(checkboxes)
-      .filter((cb) => cb.checked)
-      .map((cb) => cb.value)
-
-    if (selectedEntities.length === 0) {
-      alert("Please select at least one entity to race.")
-      return
-    }
-
-    this.derbyConfig.entities = selectedEntities
-    this.racerPositions = {}
-    this.racerData = {}
-
     this.setupRacetrack()
     this.closeConfigModal()
   }
@@ -419,58 +338,203 @@ class MonadVisualizer {
     this.updateCurrentEntities()
     this.setupRacetrack()
 
-    // Reset form
     document.getElementById("entityName").value = ""
     document.getElementById("entityAddresses").value = ""
     document.getElementById("toAddress").checked = true
   }
+}
 
-  // Add this method to the MonadVisualizer class
-  loadMoonImage(imageUrl) {
-    const container = document.getElementById("moonImageContainer")
+// Gmunk Data Stream Class
+class GmunkDataStream {
+  constructor(canvas) {
+    this.canvas = canvas
+    this.ctx = canvas.getContext("2d")
+    this.streams = []
+    this.maxStreams = 30
+    this.isActive = true
 
-    // Clear existing content
-    container.innerHTML = ""
+    this.setupCanvas()
+    this.initializeStreams()
+    this.start()
+  }
 
-    if (imageUrl) {
-      const img = document.createElement("img")
-      img.src = imageUrl
-      img.alt = "Monad Character"
-      img.style.opacity = "0"
-      img.style.transition = "opacity 0.5s ease"
+  setupCanvas() {
+    this.resize()
+    this.ctx.globalCompositeOperation = "screen"
+    window.addEventListener("resize", () => this.resize())
+  }
 
-      img.onload = () => {
-        img.style.opacity = "1"
-      }
+  resize() {
+    const rect = this.canvas.getBoundingClientRect()
+    this.canvas.width = rect.width
+    this.canvas.height = rect.height
+    this.width = rect.width
+    this.height = rect.height
+  }
 
-      img.onerror = () => {
-        console.warn("Failed to load moon image:", imageUrl)
-        // Container will show placeholder moon emoji
-      }
-
-      container.appendChild(img)
+  initializeStreams() {
+    this.streams = []
+    for (let i = 0; i < this.maxStreams; i++) {
+      this.createStream(i)
     }
   }
 
-  // Add this method to expose image loading functionality
-  setMoonCharacter(imageUrl) {
-    this.loadMoonImage(imageUrl)
+  createStream(index) {
+    const stream = {
+      x: (index / this.maxStreams) * this.width,
+      segments: [],
+      baseIntensity: Math.random() * 0.5 + 0.3,
+      frequency: Math.random() * 0.02 + 0.01,
+      phase: Math.random() * Math.PI * 2,
+      color: this.getStreamColor(index),
+      width: Math.random() * 6 + 3,
+    }
+
+    for (let y = 0; y < this.height + 50; y += 4) {
+      stream.segments.push({
+        y: y,
+        intensity: 0,
+        height: Math.random() * 12 + 4,
+        targetIntensity: 0,
+        life: 0,
+      })
+    }
+
+    this.streams.push(stream)
+  }
+
+  getStreamColor(index) {
+    const colors = [
+      { r: 255, g: 0, b: 128 }, // Pink
+      { r: 128, g: 0, b: 255 }, // Purple
+      { r: 0, g: 128, b: 255 }, // Blue
+      { r: 0, g: 255, b: 255 }, // Cyan
+    ]
+    return colors[index % colors.length]
+  }
+
+  update() {
+    const time = Date.now() * 0.001
+
+    this.streams.forEach((stream) => {
+      const activityWave = Math.sin(time * stream.frequency + stream.phase) * 0.5 + 0.5
+      const burstProbability = stream.baseIntensity * activityWave * 0.08
+
+      stream.segments.forEach((segment) => {
+        if (Math.random() < burstProbability) {
+          segment.targetIntensity = Math.random() * 0.8 + 0.2
+          segment.life = Math.random() * 1500 + 800
+        }
+
+        if (segment.life > 0) {
+          segment.life -= 16
+          const lifeFactor = Math.max(0, segment.life / 1500)
+          segment.intensity = this.lerp(segment.intensity, segment.targetIntensity * lifeFactor, 0.1)
+        } else {
+          segment.intensity = this.lerp(segment.intensity, 0, 0.05)
+        }
+      })
+    })
+  }
+
+  render() {
+    this.ctx.fillStyle = "rgba(0, 0, 0, 0.1)"
+    this.ctx.fillRect(0, 0, this.width, this.height)
+
+    this.streams.forEach((stream) => {
+      stream.segments.forEach((segment) => {
+        if (segment.intensity > 0.01) {
+          this.renderSegment(stream, segment)
+        }
+      })
+    })
+  }
+
+  renderSegment(stream, segment) {
+    const { color } = stream
+    const alpha = segment.intensity
+    const glowSize = segment.height * (1 + segment.intensity * 2)
+
+    this.ctx.save()
+
+    // Glow effect
+    const gradient = this.ctx.createRadialGradient(stream.x, segment.y, 0, stream.x, segment.y, glowSize)
+    gradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`)
+    gradient.addColorStop(0.3, `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * 0.6})`)
+    gradient.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`)
+
+    this.ctx.fillStyle = gradient
+    this.ctx.fillRect(stream.x - glowSize, segment.y - segment.height / 2, glowSize * 2, segment.height)
+
+    // Core segment
+    this.ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * 1.5})`
+    this.ctx.fillRect(stream.x - stream.width / 2, segment.y - segment.height / 2, stream.width, segment.height)
+
+    this.ctx.restore()
+  }
+
+  addTransaction(data) {
+    const streamIndex = Math.floor(Math.random() * this.streams.length)
+    let intensity = 0.3
+
+    switch (data.type) {
+      case "small":
+        intensity = 0.3
+        break
+      case "medium":
+        intensity = 0.5
+        break
+      case "large":
+        intensity = 0.7
+        break
+      case "supernova":
+        intensity = 1.0
+        break
+    }
+
+    this.triggerDataBurst(streamIndex, intensity)
+  }
+
+  triggerDataBurst(streamIndex, intensity = 1) {
+    if (streamIndex < this.streams.length) {
+      const stream = this.streams[streamIndex]
+      const burstHeight = Math.floor(this.height * 0.3)
+      const startY = Math.random() * (this.height - burstHeight)
+
+      for (let i = 0; i < burstHeight; i += 4) {
+        const segmentIndex = Math.floor((startY + i) / 4)
+        if (segmentIndex < stream.segments.length) {
+          const segment = stream.segments[segmentIndex]
+          segment.targetIntensity = intensity * (Math.random() * 0.5 + 0.5)
+          segment.life = Math.random() * 1200 + 800
+        }
+      }
+    }
+  }
+
+  lerp(start, end, factor) {
+    return start + (end - start) * factor
+  }
+
+  start() {
+    this.isActive = true
+    this.animate()
+  }
+
+  animate() {
+    if (this.isActive) {
+      this.update()
+      this.render()
+      requestAnimationFrame(() => this.animate())
+    }
+  }
+
+  stop() {
+    this.isActive = false
   }
 }
 
-// Initialize the application when DOM is loaded
+// Initialize the application
 document.addEventListener("DOMContentLoaded", () => {
   new MonadVisualizer()
 })
-
-// Performance optimization: Use requestAnimationFrame for smooth animations
-let lastFrameTime = 0
-function optimizedUpdate(currentTime) {
-  if (currentTime - lastFrameTime >= 16) {
-    // ~60fps
-    // Perform any frame-based updates here
-    lastFrameTime = currentTime
-  }
-  requestAnimationFrame(optimizedUpdate)
-}
-requestAnimationFrame(optimizedUpdate)
