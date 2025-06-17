@@ -81,15 +81,38 @@ class MonadVisualizer {
   simulateDataStream() {
     const createBurst = () => {
       if (this.currentTab === "cityscape") {
-        // More chaotic clustering: 5-20 bars per burst
-        const burstSize = 5 + Math.floor(Math.random() * 16)
+        // More varied clustering: sometimes small bursts, sometimes large waves
+        const burstType = Math.random()
+        let burstSize
+
+        if (burstType < 0.4) {
+          // Small burst (40% chance)
+          burstSize = 3 + Math.floor(Math.random() * 5) // 3-7 bars
+        } else if (burstType < 0.8) {
+          // Medium burst (40% chance)
+          burstSize = 8 + Math.floor(Math.random() * 8) // 8-15 bars
+        } else {
+          // Large wave (20% chance)
+          burstSize = 16 + Math.floor(Math.random() * 12) // 16-27 bars
+        }
+
         this.burst(burstSize)
       }
     }
 
     const scheduleNextBurst = () => {
-      // More random intervals: 400ms to 1000ms
-      const delay = 400 + Math.random() * 600
+      // More natural rhythm: shorter gaps between small bursts, longer gaps after large waves
+      const lastBurstSize = this.lastBurstSize || 10
+      let delay
+
+      if (lastBurstSize < 8) {
+        delay = 300 + Math.random() * 400 // 300-700ms for small bursts
+      } else if (lastBurstSize < 16) {
+        delay = 500 + Math.random() * 600 // 500-1100ms for medium bursts
+      } else {
+        delay = 800 + Math.random() * 800 // 800-1600ms for large waves
+      }
+
       setTimeout(() => {
         createBurst()
         scheduleNextBurst()
@@ -104,94 +127,55 @@ class MonadVisualizer {
     if (!container) return
 
     const bar = document.createElement("div")
-    bar.classList.add("transaction-bar", transaction.type)
+    bar.classList.add("transaction-bar", transaction.type, "animated")
 
-    // Random width (40px to 120px for more variation)
-    const width = Math.random() * 80 + 40
+    // Grid-aligned positioning
+    const numColumns = 24 // 24 vertical grid lines for good distribution
+    const columnWidth = container.clientWidth / numColumns
+    const columnIndex = Math.floor(Math.random() * numColumns)
+    const x = columnIndex * columnWidth + columnWidth / 2 // center on grid line
+
+    // Random width (40px to 100px, but aligned to grid)
+    const width = Math.random() * 60 + 40
     bar.style.width = `${width}px`
-
-    // Random horizontal position
-    const x = Math.random() * (container.clientWidth - width)
     bar.style.left = `${x}px`
 
     // Start at bottom
     const startY = container.clientHeight + 20
     bar.style.top = `${startY}px`
 
-    // Add subtle color variation
-    const hue = Math.random() * 30 // 0-30 degrees for white to soft pink/blue
-    const saturation = Math.random() * 20 + 80 // 80-100%
-    const lightness = Math.random() * 10 + 85 // 85-95%
+    // Assign Monad colors randomly
+    const monadColors = ["monad-purple", "monad-berry", "monad-off-white"]
+    const colorClass = monadColors[Math.floor(Math.random() * monadColors.length)]
+    bar.classList.add(colorClass)
 
-    if (transaction.type === "small") {
-      bar.style.background = `hsl(${320 + hue}, ${saturation}%, ${lightness}%)`
-    } else if (transaction.type === "medium") {
-      bar.style.background = `hsl(${280 + hue}, ${saturation}%, ${lightness}%)`
+    // Weight colors based on transaction type for visual hierarchy
+    if (transaction.type === "supernova") {
+      // Supernova always gets off-white for maximum impact
+      bar.classList.remove(colorClass)
+      bar.classList.add("monad-off-white")
     } else if (transaction.type === "large") {
-      bar.style.background = `hsl(${200 + hue}, ${saturation}%, ${lightness}%)`
-    } else {
-      bar.style.background = `hsl(${180 + hue}, ${saturation}%, ${lightness}%)`
+      // Large transactions favor purple and off-white
+      const largeTxColors = ["monad-purple", "monad-off-white"]
+      const largeTxColor = largeTxColors[Math.floor(Math.random() * largeTxColors.length)]
+      bar.classList.remove(colorClass)
+      bar.classList.add(largeTxColor)
     }
+    // Small and medium keep random assignment
 
     container.appendChild(bar)
 
-    // Enhanced animation with stronger glow and easing
-    let y = startY
-    const totalDistance = container.clientHeight + 140
-    let animationFrame = 0
-
-    const animate = () => {
-      animationFrame++
-      const progress = (startY - y) / totalDistance
-
-      // Ease-out motion curve
-      const easeOutProgress = 1 - Math.pow(1 - animationFrame / 150, 3)
-      y = startY - totalDistance * easeOutProgress
-
-      // Position
-      bar.style.top = `${y}px`
-
-      // Enhanced glow intensity: much stronger peak at center
-      const centerDistance = Math.abs(progress - 0.5)
-      const glowStrength = Math.max(0, 1 - centerDistance * 2.5)
-
-      // Stronger opacity and glow effects
-      bar.style.opacity = Math.max(0.1, glowStrength * 1.2)
-
-      // Dynamic filter intensity
-      const blurAmount = glowStrength * 8 + 2
-      const dropShadowIntensity = glowStrength * 0.9 + 0.3
-
-      bar.style.filter = `
-        drop-shadow(0 0 ${blurAmount}px rgba(255, 255, 255, ${dropShadowIntensity})) 
-        drop-shadow(0 0 ${blurAmount * 2}px rgba(255, 255, 255, ${dropShadowIntensity * 0.6}))
-        blur(${glowStrength * 3}px)
-      `
-
-      // Enhanced box-shadow for volumetric glow
-      const shadowSize1 = glowStrength * 15 + 5
-      const shadowSize2 = glowStrength * 30 + 10
-      const shadowSize3 = glowStrength * 45 + 15
-
-      bar.style.boxShadow = `
-        0 0 ${shadowSize1}px rgba(255, 255, 255, ${glowStrength * 0.8}),
-        0 0 ${shadowSize2}px rgba(255, 255, 255, ${glowStrength * 0.4}),
-        0 0 ${shadowSize3}px rgba(255, 255, 255, ${glowStrength * 0.2})
-      `
-
-      if (y < -40 || animationFrame > 150) {
+    // Remove bar after animation completes
+    setTimeout(() => {
+      if (bar.parentNode) {
         bar.remove()
-      } else {
-        requestAnimationFrame(animate)
       }
-    }
-
-    animate()
+    }, 3600) // Slightly longer than animation duration
   }
 
   burst(count = 10) {
     const transactionTypes = ["small", "medium", "large", "supernova"]
-    const weights = [0.6, 0.25, 0.12, 0.03]
+    const weights = [0.65, 0.22, 0.11, 0.02] // Slightly adjusted for better visual balance
 
     for (let i = 0; i < count; i++) {
       // Determine transaction type
@@ -214,12 +198,13 @@ class MonadVisualizer {
         type: type,
       }
 
-      // Even tighter temporal grouping with some randomness
+      // Staggered timing within burst for natural flow
+      const delay = Math.random() * 120 // 0-120ms spread
       setTimeout(() => {
         this.createTransactionBar(transaction)
         this.addToDataFeed(transaction)
         this.transactionCount++
-      }, Math.random() * 80) // 0-80ms spread for very tight clustering
+      }, delay)
     }
   }
 
