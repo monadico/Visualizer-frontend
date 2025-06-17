@@ -81,14 +81,15 @@ class MonadVisualizer {
   simulateDataStream() {
     const createBurst = () => {
       if (this.currentTab === "cityscape") {
-        // Randomize 8-15 bars per burst for tighter grouping
-        const burstSize = 8 + Math.floor(Math.random() * 8)
+        // More chaotic clustering: 5-20 bars per burst
+        const burstSize = 5 + Math.floor(Math.random() * 16)
         this.burst(burstSize)
       }
     }
 
     const scheduleNextBurst = () => {
-      const delay = Math.random() * 300 + 700 // 700-1000ms intervals
+      // More random intervals: 400ms to 1000ms
+      const delay = 400 + Math.random() * 600
       setTimeout(() => {
         createBurst()
         scheduleNextBurst()
@@ -105,8 +106,8 @@ class MonadVisualizer {
     const bar = document.createElement("div")
     bar.classList.add("transaction-bar", transaction.type)
 
-    // Random width (50px to 150px)
-    const width = Math.random() * 100 + 50
+    // Random width (40px to 120px for more variation)
+    const width = Math.random() * 80 + 40
     bar.style.width = `${width}px`
 
     // Random horizontal position
@@ -114,32 +115,71 @@ class MonadVisualizer {
     bar.style.left = `${x}px`
 
     // Start at bottom
-    const startY = container.clientHeight
+    const startY = container.clientHeight + 20
     bar.style.top = `${startY}px`
+
+    // Add subtle color variation
+    const hue = Math.random() * 30 // 0-30 degrees for white to soft pink/blue
+    const saturation = Math.random() * 20 + 80 // 80-100%
+    const lightness = Math.random() * 10 + 85 // 85-95%
+
+    if (transaction.type === "small") {
+      bar.style.background = `hsl(${320 + hue}, ${saturation}%, ${lightness}%)`
+    } else if (transaction.type === "medium") {
+      bar.style.background = `hsl(${280 + hue}, ${saturation}%, ${lightness}%)`
+    } else if (transaction.type === "large") {
+      bar.style.background = `hsl(${200 + hue}, ${saturation}%, ${lightness}%)`
+    } else {
+      bar.style.background = `hsl(${180 + hue}, ${saturation}%, ${lightness}%)`
+    }
 
     container.appendChild(bar)
 
-    // Animate with dynamic glow based on Y-position
+    // Enhanced animation with stronger glow and easing
     let y = startY
-    const totalDistance = container.clientHeight + 100
+    const totalDistance = container.clientHeight + 140
+    let animationFrame = 0
 
     const animate = () => {
+      animationFrame++
       const progress = (startY - y) / totalDistance
-      y -= 2 // Constant speed
+
+      // Ease-out motion curve
+      const easeOutProgress = 1 - Math.pow(1 - animationFrame / 150, 3)
+      y = startY - totalDistance * easeOutProgress
 
       // Position
       bar.style.top = `${y}px`
 
-      // Glow intensity: peak around 50% height with narrower band
-      const glowStrength = Math.max(
-        0,
-        1 - Math.abs(progress - 0.5) * 3, // narrower peak band
-      )
+      // Enhanced glow intensity: much stronger peak at center
+      const centerDistance = Math.abs(progress - 0.5)
+      const glowStrength = Math.max(0, 1 - centerDistance * 2.5)
 
-      bar.style.opacity = glowStrength
-      bar.style.filter = `blur(${glowStrength * 6}px)`
+      // Stronger opacity and glow effects
+      bar.style.opacity = Math.max(0.1, glowStrength * 1.2)
 
-      if (y < -20) {
+      // Dynamic filter intensity
+      const blurAmount = glowStrength * 8 + 2
+      const dropShadowIntensity = glowStrength * 0.9 + 0.3
+
+      bar.style.filter = `
+        drop-shadow(0 0 ${blurAmount}px rgba(255, 255, 255, ${dropShadowIntensity})) 
+        drop-shadow(0 0 ${blurAmount * 2}px rgba(255, 255, 255, ${dropShadowIntensity * 0.6}))
+        blur(${glowStrength * 3}px)
+      `
+
+      // Enhanced box-shadow for volumetric glow
+      const shadowSize1 = glowStrength * 15 + 5
+      const shadowSize2 = glowStrength * 30 + 10
+      const shadowSize3 = glowStrength * 45 + 15
+
+      bar.style.boxShadow = `
+        0 0 ${shadowSize1}px rgba(255, 255, 255, ${glowStrength * 0.8}),
+        0 0 ${shadowSize2}px rgba(255, 255, 255, ${glowStrength * 0.4}),
+        0 0 ${shadowSize3}px rgba(255, 255, 255, ${glowStrength * 0.2})
+      `
+
+      if (y < -40 || animationFrame > 150) {
         bar.remove()
       } else {
         requestAnimationFrame(animate)
@@ -174,12 +214,12 @@ class MonadVisualizer {
         type: type,
       }
 
-      // Tight temporal grouping - spawn almost simultaneously
+      // Even tighter temporal grouping with some randomness
       setTimeout(() => {
         this.createTransactionBar(transaction)
         this.addToDataFeed(transaction)
         this.transactionCount++
-      }, Math.random() * 50) // 0-50ms spread for tight grouping
+      }, Math.random() * 80) // 0-80ms spread for very tight clustering
     }
   }
 

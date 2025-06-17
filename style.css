@@ -246,63 +246,84 @@ body {
   z-index: 2;
 }
 
-/* Transaction Bars - Now Short Segments */
+/* Transaction Bars - Enhanced with Stronger Glow */
 .transaction-bar {
   position: absolute;
   height: 2px;
   opacity: 0;
-  filter: blur(0px);
   z-index: 5;
   border-radius: 1px;
+  background: white;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 16px rgba(255, 255, 255, 0.6));
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+.transaction-bar::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  filter: blur(8px);
+  opacity: 0.6;
+  top: 0;
+  left: 0;
+  z-index: -1;
 }
 
 .transaction-bar.small {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 0, 128, 0.3) 20%,
-    rgba(255, 0, 128, 0.8) 50%,
-    rgba(255, 0, 128, 0.3) 80%,
-    transparent 100%
-  );
-  box-shadow: 0 0 8px rgba(255, 0, 128, 0.4);
+  background: hsl(320, 100%, 90%);
+  filter: drop-shadow(0 0 6px rgba(255, 0, 128, 0.8)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.6));
+  box-shadow: 0 0 8px rgba(255, 0, 128, 0.6), 0 0 16px rgba(255, 255, 255, 0.4);
 }
 
 .transaction-bar.medium {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(128, 0, 255, 0.4) 20%,
-    rgba(128, 0, 255, 0.9) 50%,
-    rgba(128, 0, 255, 0.4) 80%,
-    transparent 100%
-  );
-  box-shadow: 0 0 12px rgba(128, 0, 255, 0.5);
+  background: hsl(280, 100%, 90%);
+  filter: drop-shadow(0 0 8px rgba(128, 0, 255, 0.8)) drop-shadow(0 0 16px rgba(255, 255, 255, 0.6));
+  box-shadow: 0 0 10px rgba(128, 0, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.4);
 }
 
 .transaction-bar.large {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(0, 128, 255, 0.5) 20%,
-    rgba(0, 128, 255, 1) 50%,
-    rgba(0, 128, 255, 0.5) 80%,
-    transparent 100%
-  );
-  box-shadow: 0 0 16px rgba(0, 128, 255, 0.6);
+  background: hsl(200, 100%, 90%);
+  filter: drop-shadow(0 0 10px rgba(0, 128, 255, 0.8)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.6));
+  box-shadow: 0 0 12px rgba(0, 128, 255, 0.8), 0 0 24px rgba(255, 255, 255, 0.4);
 }
 
 .transaction-bar.supernova {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(0, 255, 255, 0.6) 15%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(0, 255, 255, 0.6) 85%,
-    transparent 100%
-  );
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.4);
+  background: hsl(180, 100%, 95%);
   height: 3px;
+  filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.9)) drop-shadow(0 0 24px rgba(255, 255, 255, 0.8));
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.9), 0 0 30px rgba(255, 255, 255, 0.6), 0 0 45px rgba(255, 255, 255, 0.3);
+}
+
+/* Enhanced Animation Keyframes */
+@keyframes slideUpEaseOut {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+    filter: blur(0px);
+  }
+  15% {
+    opacity: 0.3;
+    filter: blur(2px);
+  }
+  50% {
+    opacity: 1;
+    filter: blur(4px);
+  }
+  85% {
+    opacity: 0.7;
+    filter: blur(2px);
+  }
+  100% {
+    transform: translateY(-120vh);
+    opacity: 0;
+    filter: blur(0px);
+  }
+}
+
+.transaction-bar.animated {
+  animation: slideUpEaseOut 2.5s ease-out forwards;
 }
 
 /* Remove the old transaction light styles */
