@@ -236,6 +236,7 @@ body {
   animation: slideUp 2s ease-out forwards;
   z-index: 5;
   overflow: hidden;
+  position: relative;
   background: linear-gradient(
     180deg,
     transparent 0%,
@@ -245,6 +246,82 @@ body {
     transparent 100%
   );
   box-shadow: 0 0 10px rgba(255, 0, 128, 0.8), 0 0 20px rgba(255, 0, 128, 0.4);
+}
+
+.transaction-light .light-slide {
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 400%;
+  height: 400%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.2) 35%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.2) 65%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  animation: slide-light 3s ease-in-out infinite;
+  transform: rotate(25deg);
+  z-index: 2;
+  filter: blur(1px);
+}
+
+.transaction-light.medium .light-slide {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.3) 65%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  filter: blur(1.5px);
+}
+
+.transaction-light.large .light-slide {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 15%,
+    rgba(255, 255, 255, 0.4) 30%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.4) 70%,
+    rgba(255, 255, 255, 0) 85%
+  );
+  filter: blur(2px);
+  animation: slide-light 2.5s ease-in-out infinite;
+}
+
+.transaction-light.supernova .light-slide {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 10%,
+    rgba(255, 255, 255, 0.5) 25%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.5) 75%,
+    rgba(255, 255, 255, 0) 90%
+  );
+  filter: blur(3px) brightness(1.2);
+  animation: slide-light 2s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes slide-light {
+  0% {
+    transform: translateX(-150%) rotate(25deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(150%) rotate(25deg);
+    opacity: 0;
+  }
 }
 
 .transaction-light::before {
