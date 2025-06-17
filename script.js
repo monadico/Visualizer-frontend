@@ -143,11 +143,6 @@ class MonadVisualizer {
     const light = document.createElement("div")
     light.className = `transaction-light ${transaction.type}`
 
-    // Create the light slide element
-    const lightSlide = document.createElement("div")
-    lightSlide.className = "light-slide"
-    light.appendChild(lightSlide)
-
     // Position the light at the bottom of the chosen lane
     const laneRect = lane.getBoundingClientRect()
     const containerRect = lane.closest(".data-stream-container").getBoundingClientRect()
