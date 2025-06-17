@@ -227,7 +227,7 @@ body {
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(16, 16, 32, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
 }
 
-/* Enhanced Transaction Light with Glass Gloss Effect */
+/* Transaction Light with Proper Light Slide Effect */
 .transaction-light {
   position: absolute;
   width: 4px;
@@ -238,11 +238,9 @@ body {
   animation: slideUp 2s ease-out forwards;
   z-index: 5;
   overflow: hidden;
-  position: relative;
 }
 
-.transaction-light::before {
-  content: "";
+.transaction-light .light-slide {
   position: absolute;
   top: -50%;
   left: -50%;
@@ -251,12 +249,12 @@ body {
   background: linear-gradient(
     120deg,
     rgba(255, 255, 255, 0) 30%,
-    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.5) 50%,
     rgba(255, 255, 255, 0) 70%
   );
+  animation: slide-light 3s ease-in-out infinite;
   transform: rotate(25deg);
-  animation: lightGloss 1.5s ease-in-out infinite;
-  pointer-events: none;
+  z-index: 1;
 }
 
 .transaction-light.medium {
@@ -266,11 +264,11 @@ body {
   box-shadow: 0 0 15px #8000ff, 0 0 30px rgba(128, 0, 255, 0.5);
 }
 
-.transaction-light.medium::before {
+.transaction-light.medium .light-slide {
   background: linear-gradient(
     120deg,
     rgba(255, 255, 255, 0) 30%,
-    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0.6) 50%,
     rgba(255, 255, 255, 0) 70%
   );
 }
@@ -282,11 +280,11 @@ body {
   box-shadow: 0 0 20px #0080ff, 0 0 40px rgba(0, 128, 255, 0.5);
 }
 
-.transaction-light.large::before {
+.transaction-light.large .light-slide {
   background: linear-gradient(
     120deg,
     rgba(255, 255, 255, 0) 30%,
-    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.7) 50%,
     rgba(255, 255, 255, 0) 70%
   );
 }
@@ -298,14 +296,14 @@ body {
   box-shadow: 0 0 30px #00ffff, 0 0 60px rgba(0, 255, 255, 0.8), 0 0 90px rgba(255, 255, 255, 0.3);
 }
 
-.transaction-light.supernova::before {
+.transaction-light.supernova .light-slide {
   background: linear-gradient(
     120deg,
     rgba(255, 255, 255, 0) 20%,
-    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.8) 50%,
     rgba(255, 255, 255, 0) 80%
   );
-  animation: lightGloss 1s ease-in-out infinite;
+  animation: slide-light 2s ease-in-out infinite;
 }
 
 @keyframes slideUp {
@@ -329,17 +327,12 @@ body {
   }
 }
 
-@keyframes lightGloss {
+@keyframes slide-light {
   0% {
     transform: translateX(-100%) rotate(25deg);
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
   }
   100% {
     transform: translateX(100%) rotate(25deg);
-    opacity: 0;
   }
 }
 
@@ -947,27 +940,5 @@ body {
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
-  }
-}
-
-/* Performance optimizations */
-.light-sweep-element,
-.light-sweep-1,
-.light-sweep-2,
-.light-sweep-3,
-.transaction-triggered-sweep {
-  will-change: transform, opacity;
-  transform: translateZ(0);
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  .light-sweep-element,
-  .light-sweep-1,
-  .light-sweep-2,
-  .light-sweep-3,
-  .transaction-triggered-sweep {
-    animation: none;
-    opacity: 0.3;
   }
 }
