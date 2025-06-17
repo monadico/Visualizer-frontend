@@ -236,17 +236,24 @@ body {
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(16, 16, 32, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
 }
 
-/* Transaction Bars */
+/* Soft White Overlay for Light Diffusion */
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Transaction Bars - Now Short Segments */
 .transaction-bar {
   position: absolute;
-  left: 0;
-  width: 100%;
   height: 2px;
-  background: rgba(255, 255, 255, 0.1);
   opacity: 0;
   filter: blur(0px);
-  transition: opacity 0.3s ease, filter 0.3s ease;
   z-index: 5;
+  border-radius: 1px;
 }
 
 .transaction-bar.small {
@@ -296,18 +303,6 @@ body {
   );
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.4);
   height: 3px;
-}
-
-/* Glow Animation States */
-.transaction-bar.glowing {
-  opacity: 1;
-  filter: blur(2px);
-}
-
-.transaction-bar.sliding {
-  transition: transform 2s ease-out, opacity 2s ease-out;
-  transform: translateY(-120vh);
-  opacity: 0;
 }
 
 /* Remove the old transaction light styles */

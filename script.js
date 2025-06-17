@@ -10,9 +10,6 @@ class MonadVisualizer {
     this.racerPositions = {}
     this.racerData = {}
 
-    // Transaction lanes for light animations
-    this.transactionLanes = []
-
     this.init()
     window.visualizer = this
   }
@@ -84,14 +81,14 @@ class MonadVisualizer {
   simulateDataStream() {
     const createBurst = () => {
       if (this.currentTab === "cityscape") {
-        // Randomize 6-10 bars per burst
-        const burstSize = 6 + Math.floor(Math.random() * 5)
+        // Randomize 8-15 bars per burst for tighter grouping
+        const burstSize = 8 + Math.floor(Math.random() * 8)
         this.burst(burstSize)
       }
     }
 
     const scheduleNextBurst = () => {
-      const delay = Math.random() * 400 + 400 // 400-800ms intervals
+      const delay = Math.random() * 300 + 700 // 700-1000ms intervals
       setTimeout(() => {
         createBurst()
         scheduleNextBurst()
@@ -101,37 +98,58 @@ class MonadVisualizer {
     scheduleNextBurst()
   }
 
-  createTransactionBar(transaction, yOffset = 0) {
+  createTransactionBar(transaction) {
     const container = document.querySelector(".transaction-container")
     if (!container) return
 
     const bar = document.createElement("div")
     bar.classList.add("transaction-bar", transaction.type)
 
-    const initialY = container.clientHeight + yOffset
-    bar.style.top = `${initialY}px`
+    // Random width (50px to 150px)
+    const width = Math.random() * 100 + 50
+    bar.style.width = `${width}px`
+
+    // Random horizontal position
+    const x = Math.random() * (container.clientWidth - width)
+    bar.style.left = `${x}px`
+
+    // Start at bottom
+    const startY = container.clientHeight
+    bar.style.top = `${startY}px`
 
     container.appendChild(bar)
 
-    // Animate into glowing and sliding
-    requestAnimationFrame(() => {
-      bar.classList.add("glowing")
+    // Animate with dynamic glow based on Y-position
+    let y = startY
+    const totalDistance = container.clientHeight + 100
 
-      // Start sliding after brief glow
-      setTimeout(() => {
-        bar.classList.add("sliding")
-      }, 100)
-    })
+    const animate = () => {
+      const progress = (startY - y) / totalDistance
+      y -= 2 // Constant speed
 
-    // Remove after animation ends
-    setTimeout(() => {
-      if (bar.parentNode) {
-        bar.parentNode.removeChild(bar)
+      // Position
+      bar.style.top = `${y}px`
+
+      // Glow intensity: peak around 50% height with narrower band
+      const glowStrength = Math.max(
+        0,
+        1 - Math.abs(progress - 0.5) * 3, // narrower peak band
+      )
+
+      bar.style.opacity = glowStrength
+      bar.style.filter = `blur(${glowStrength * 6}px)`
+
+      if (y < -20) {
+        bar.remove()
+      } else {
+        requestAnimationFrame(animate)
       }
-    }, 2500)
+    }
+
+    animate()
   }
 
-  burst(count = 8) {
+  burst(count = 10) {
     const transactionTypes = ["small", "medium", "large", "supernova"]
     const weights = [0.6, 0.25, 0.12, 0.03]
 
@@ -156,12 +174,12 @@ class MonadVisualizer {
         type: type,
       }
 
-      // Offset small variations to simulate natural flow
+      // Tight temporal grouping - spawn almost simultaneously
       setTimeout(() => {
-        this.createTransactionBar(transaction, i * 2)
+        this.createTransactionBar(transaction)
         this.addToDataFeed(transaction)
         this.transactionCount++
-      }, i * 30)
+      }, Math.random() * 50) // 0-50ms spread for tight grouping
     }
   }
 
