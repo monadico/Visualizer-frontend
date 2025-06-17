@@ -10,8 +10,8 @@ class MonadVisualizer {
     this.racerPositions = {}
     this.racerData = {}
 
-    // Gmunk stream instance
-    this.gmunkStream = null
+    // Transaction lanes for light animations
+    this.transactionLanes = []
 
     this.init()
     window.visualizer = this
@@ -20,15 +20,12 @@ class MonadVisualizer {
   init() {
     this.setupEventListeners()
     this.initializeDerby()
-    this.initializeGmunkStream()
+    this.initializeTransactionLanes()
     this.startSimulations()
   }
 
-  initializeGmunkStream() {
-    const canvas = document.getElementById("gmunk-canvas")
-    if (canvas) {
-      this.gmunkStream = new GmunkDataStream(canvas)
-    }
+  initializeTransactionLanes() {
+    this.transactionLanes = document.querySelectorAll(".transaction-lane")
   }
 
   setupEventListeners() {
@@ -92,7 +89,7 @@ class MonadVisualizer {
   simulateDataStream() {
     const createTransaction = () => {
       const transactionTypes = ["small", "medium", "large", "supernova"]
-      const weights = [0.5, 0.3, 0.15, 0.05]
+      const weights = [0.6, 0.25, 0.12, 0.03]
 
       let random = Math.random()
       let type = "small"
@@ -113,9 +110,9 @@ class MonadVisualizer {
         type: type,
       }
 
-      // Add to gmunk stream
-      if (this.gmunkStream && this.currentTab === "cityscape") {
-        this.gmunkStream.addTransaction(transaction)
+      // Create sliding light animation
+      if (this.currentTab === "cityscape") {
+        this.createTransactionLight(transaction)
       }
 
       // Add to data feed
@@ -125,7 +122,7 @@ class MonadVisualizer {
     }
 
     const scheduleNextTransaction = () => {
-      const delay = Math.random() * 400 + 100
+      const delay = Math.random() * 300 + 150 // 150-450ms intervals
       setTimeout(() => {
         createTransaction()
         scheduleNextTransaction()
@@ -133,6 +130,40 @@ class MonadVisualizer {
     }
 
     scheduleNextTransaction()
+  }
+
+  createTransactionLight(transaction) {
+    if (this.transactionLanes.length === 0) return
+
+    // Choose a random lane
+    const laneIndex = Math.floor(Math.random() * this.transactionLanes.length)
+    const lane = this.transactionLanes[laneIndex]
+
+    // Create the light element
+    const light = document.createElement("div")
+    light.className = `transaction-light ${transaction.type}`
+
+    // Position the light at the bottom of the chosen lane
+    const laneRect = lane.getBoundingClientRect()
+    const containerRect = lane.closest(".data-stream-container").getBoundingClientRect()
+
+    light.style.left = laneRect.left - containerRect.left + laneRect.width / 2 - 2 + "px"
+    light.style.bottom = "-50px"
+
+    // Add slight random horizontal offset for variety
+    const randomOffset = (Math.random() - 0.5) * 20
+    light.style.transform = `translateX(${randomOffset}px)`
+
+    // Add to container
+    const container = document.querySelector(".data-stream-container")
+    container.appendChild(light)
+
+    // Remove the light after animation completes
+    setTimeout(() => {
+      if (light.parentNode) {
+        light.parentNode.removeChild(light)
+      }
+    }, 2000)
   }
 
   addToDataFeed(transaction) {
@@ -167,7 +198,7 @@ class MonadVisualizer {
     setInterval(updateTps, 1000)
   }
 
-  // Derby Implementation (keeping original)
+  // Keep all the existing Derby methods unchanged...
   initializeDerby() {
     this.updateCurrentEntities()
     this.setupRacetrack()
@@ -341,196 +372,6 @@ class MonadVisualizer {
     document.getElementById("entityName").value = ""
     document.getElementById("entityAddresses").value = ""
     document.getElementById("toAddress").checked = true
-  }
-}
-
-// Gmunk Data Stream Class
-class GmunkDataStream {
-  constructor(canvas) {
-    this.canvas = canvas
-    this.ctx = canvas.getContext("2d")
-    this.streams = []
-    this.maxStreams = 30
-    this.isActive = true
-
-    this.setupCanvas()
-    this.initializeStreams()
-    this.start()
-  }
-
-  setupCanvas() {
-    this.resize()
-    this.ctx.globalCompositeOperation = "screen"
-    window.addEventListener("resize", () => this.resize())
-  }
-
-  resize() {
-    const rect = this.canvas.getBoundingClientRect()
-    this.canvas.width = rect.width
-    this.canvas.height = rect.height
-    this.width = rect.width
-    this.height = rect.height
-  }
-
-  initializeStreams() {
-    this.streams = []
-    for (let i = 0; i < this.maxStreams; i++) {
-      this.createStream(i)
-    }
-  }
-
-  createStream(index) {
-    const stream = {
-      x: (index / this.maxStreams) * this.width,
-      segments: [],
-      baseIntensity: Math.random() * 0.5 + 0.3,
-      frequency: Math.random() * 0.02 + 0.01,
-      phase: Math.random() * Math.PI * 2,
-      color: this.getStreamColor(index),
-      width: Math.random() * 6 + 3,
-    }
-
-    for (let y = 0; y < this.height + 50; y += 4) {
-      stream.segments.push({
-        y: y,
-        intensity: 0,
-        height: Math.random() * 12 + 4,
-        targetIntensity: 0,
-        life: 0,
-      })
-    }
-
-    this.streams.push(stream)
-  }
-
-  getStreamColor(index) {
-    const colors = [
-      { r: 255, g: 0, b: 128 }, // Pink
-      { r: 128, g: 0, b: 255 }, // Purple
-      { r: 0, g: 128, b: 255 }, // Blue
-      { r: 0, g: 255, b: 255 }, // Cyan
-    ]
-    return colors[index % colors.length]
-  }
-
-  update() {
-    const time = Date.now() * 0.001
-
-    this.streams.forEach((stream) => {
-      const activityWave = Math.sin(time * stream.frequency + stream.phase) * 0.5 + 0.5
-      const burstProbability = stream.baseIntensity * activityWave * 0.08
-
-      stream.segments.forEach((segment) => {
-        if (Math.random() < burstProbability) {
-          segment.targetIntensity = Math.random() * 0.8 + 0.2
-          segment.life = Math.random() * 1500 + 800
-        }
-
-        if (segment.life > 0) {
-          segment.life -= 16
-          const lifeFactor = Math.max(0, segment.life / 1500)
-          segment.intensity = this.lerp(segment.intensity, segment.targetIntensity * lifeFactor, 0.1)
-        } else {
-          segment.intensity = this.lerp(segment.intensity, 0, 0.05)
-        }
-      })
-    })
-  }
-
-  render() {
-    this.ctx.fillStyle = "rgba(0, 0, 0, 0.1)"
-    this.ctx.fillRect(0, 0, this.width, this.height)
-
-    this.streams.forEach((stream) => {
-      stream.segments.forEach((segment) => {
-        if (segment.intensity > 0.01) {
-          this.renderSegment(stream, segment)
-        }
-      })
-    })
-  }
-
-  renderSegment(stream, segment) {
-    const { color } = stream
-    const alpha = segment.intensity
-    const glowSize = segment.height * (1 + segment.intensity * 2)
-
-    this.ctx.save()
-
-    // Glow effect
-    const gradient = this.ctx.createRadialGradient(stream.x, segment.y, 0, stream.x, segment.y, glowSize)
-    gradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`)
-    gradient.addColorStop(0.3, `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * 0.6})`)
-    gradient.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`)
-
-    this.ctx.fillStyle = gradient
-    this.ctx.fillRect(stream.x - glowSize, segment.y - segment.height / 2, glowSize * 2, segment.height)
-
-    // Core segment
-    this.ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * 1.5})`
-    this.ctx.fillRect(stream.x - stream.width / 2, segment.y - segment.height / 2, stream.width, segment.height)
-
-    this.ctx.restore()
-  }
-
-  addTransaction(data) {
-    const streamIndex = Math.floor(Math.random() * this.streams.length)
-    let intensity = 0.3
-
-    switch (data.type) {
-      case "small":
-        intensity = 0.3
-        break
-      case "medium":
-        intensity = 0.5
-        break
-      case "large":
-        intensity = 0.7
-        break
-      case "supernova":
-        intensity = 1.0
-        break
-    }
-
-    this.triggerDataBurst(streamIndex, intensity)
-  }
-
-  triggerDataBurst(streamIndex, intensity = 1) {
-    if (streamIndex < this.streams.length) {
-      const stream = this.streams[streamIndex]
-      const burstHeight = Math.floor(this.height * 0.3)
-      const startY = Math.random() * (this.height - burstHeight)
-
-      for (let i = 0; i < burstHeight; i += 4) {
-        const segmentIndex = Math.floor((startY + i) / 4)
-        if (segmentIndex < stream.segments.length) {
-          const segment = stream.segments[segmentIndex]
-          segment.targetIntensity = intensity * (Math.random() * 0.5 + 0.5)
-          segment.life = Math.random() * 1200 + 800
-        }
-      }
-    }
-  }
-
-  lerp(start, end, factor) {
-    return start + (end - start) * factor
-  }
-
-  start() {
-    this.isActive = true
-    this.animate()
-  }
-
-  animate() {
-    if (this.isActive) {
-      this.update()
-      this.render()
-      requestAnimationFrame(() => this.animate())
-    }
-  }
-
-  stop() {
-    this.isActive = false
   }
 }
 

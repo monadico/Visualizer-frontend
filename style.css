@@ -224,13 +224,86 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(16, 16, 32, 0.9) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(16, 16, 32, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
 }
 
-.gmunk-canvas {
+/* Transaction Light Animation */
+.transaction-light {
+  position: absolute;
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(180deg, transparent 0%, #ff0080 50%, transparent 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 10px #ff0080, 0 0 20px rgba(255, 0, 128, 0.5);
+  animation: slideUp 2s ease-out forwards;
+  z-index: 5;
+}
+
+.transaction-light.medium {
+  width: 6px;
+  height: 30px;
+  background: linear-gradient(180deg, transparent 0%, #8000ff 50%, transparent 100%);
+  box-shadow: 0 0 15px #8000ff, 0 0 30px rgba(128, 0, 255, 0.5);
+}
+
+.transaction-light.large {
+  width: 8px;
+  height: 40px;
+  background: linear-gradient(180deg, transparent 0%, #0080ff 50%, transparent 100%);
+  box-shadow: 0 0 20px #0080ff, 0 0 40px rgba(0, 128, 255, 0.5);
+}
+
+.transaction-light.supernova {
+  width: 12px;
+  height: 60px;
+  background: linear-gradient(180deg, transparent 0%, #00ffff 30%, #ffffff 50%, #00ffff 70%, transparent 100%);
+  box-shadow: 0 0 30px #00ffff, 0 0 60px rgba(0, 255, 255, 0.8), 0 0 90px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes slideUp {
+  0% {
+    bottom: -50px;
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  90% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    bottom: calc(100% + 50px);
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* Vertical lanes for transaction lights */
+.transaction-lanes {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  display: block;
+  display: flex;
+  justify-content: space-evenly;
+  pointer-events: none;
+}
+
+.transaction-lane {
+  position: relative;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+  opacity: 0.3;
+}
+
+/* Remove the gmunk-canvas styles since we're not using canvas anymore */
+.gmunk-canvas {
+  display: none;
 }
 
 .stats-overlay {
