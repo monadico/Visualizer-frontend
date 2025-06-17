@@ -12,6 +12,9 @@ class MonadVisualizer {
 
     this.init()
     window.visualizer = this
+
+    // Expose method for external image loading
+    window.setMoonCharacter = (imageUrl) => this.setMoonCharacter(imageUrl)
   }
 
   init() {
@@ -90,35 +93,50 @@ class MonadVisualizer {
 
       // Random star type based on transaction value/importance
       const rand = Math.random()
-      if (rand < 0.6) {
+      if (rand < 0.5) {
         star.className = "star small"
-      } else if (rand < 0.85) {
+      } else if (rand < 0.8) {
         star.className = "star medium"
-      } else if (rand < 0.97) {
+      } else if (rand < 0.95) {
         star.className = "star large"
       } else {
         star.className = "star supernova"
       }
 
-      // Random position
-      star.style.left = Math.random() * 100 + "%"
-      star.style.top = Math.random() * 100 + "%"
+      // Random position avoiding the center moon area
+      let x, y
+      do {
+        x = Math.random() * 100
+        y = Math.random() * 100
+      } while (this.isInMoonArea(x, y))
+
+      star.style.left = x + "%"
+      star.style.top = y + "%"
 
       starsContainer.appendChild(star)
 
-      // Remove after animation
+      // Remove after animation with performance optimization
       setTimeout(() => {
         if (star.parentNode) {
           star.parentNode.removeChild(star)
         }
-      }, 1000)
+      }, 1200)
 
       this.transactionCount++
     }
 
-    // Variable rate transaction simulation
+    // Check if position is in moon area to avoid overlap
+    this.isInMoonArea = (x, y) => {
+      const centerX = 50
+      const centerY = 50
+      const moonRadius = 15 // Percentage of screen
+      const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
+      return distance < moonRadius
+    }
+
+    // Variable rate transaction simulation with performance throttling
     const scheduleNextStar = () => {
-      const delay = Math.random() * 200 + 50 // 50-250ms
+      const delay = Math.random() * 150 + 75 // 75-225ms for better performance
       setTimeout(() => {
         createStar()
         scheduleNextStar()
@@ -128,35 +146,28 @@ class MonadVisualizer {
     scheduleNextStar()
 
     // Add moon click interaction
-    document.getElementById("spinningMoon").addEventListener("click", () => {
+    document.getElementById("centralMoon").addEventListener("click", () => {
       this.createMoonBurst()
     })
   }
 
   createMoonBurst() {
     const starsContainer = document.getElementById("starsContainer")
-    const moon = document.getElementById("spinningMoon")
-    const moonRect = moon.getBoundingClientRect()
-    const containerRect = starsContainer.getBoundingClientRect()
 
-    // Create burst of stars from moon position
-    for (let i = 0; i < 12; i++) {
+    // Create burst of stars from moon center
+    for (let i = 0; i < 16; i++) {
       setTimeout(() => {
         const star = document.createElement("div")
         star.className = "star large"
 
-        // Position relative to moon
-        const moonCenterX = ((moonRect.left + moonRect.width / 2 - containerRect.left) / containerRect.width) * 100
-        const moonCenterY = ((moonRect.top + moonRect.height / 2 - containerRect.top) / containerRect.height) * 100
+        // Position in a circle around moon center
+        const angle = (i / 16) * 2 * Math.PI
+        const distance = 20 + Math.random() * 15 // Distance from center
+        const x = 50 + Math.cos(angle) * distance
+        const y = 50 + Math.sin(angle) * distance
 
-        // Spread stars in a circle around moon
-        const angle = (i / 12) * 2 * Math.PI
-        const distance = 50 + Math.random() * 100
-        const offsetX = Math.cos(angle) * distance
-        const offsetY = Math.sin(angle) * distance
-
-        star.style.left = Math.max(0, Math.min(100, moonCenterX + (offsetX / containerRect.width) * 100)) + "%"
-        star.style.top = Math.max(0, Math.min(100, moonCenterY + (offsetY / containerRect.height) * 100)) + "%"
+        star.style.left = Math.max(0, Math.min(100, x)) + "%"
+        star.style.top = Math.max(0, Math.min(100, y)) + "%"
 
         starsContainer.appendChild(star)
 
@@ -164,8 +175,8 @@ class MonadVisualizer {
           if (star.parentNode) {
             star.parentNode.removeChild(star)
           }
-        }, 1000)
-      }, i * 50)
+        }, 1200)
+      }, i * 30)
     }
   }
 
@@ -412,6 +423,38 @@ class MonadVisualizer {
     document.getElementById("entityName").value = ""
     document.getElementById("entityAddresses").value = ""
     document.getElementById("toAddress").checked = true
+  }
+
+  // Add this method to the MonadVisualizer class
+  loadMoonImage(imageUrl) {
+    const container = document.getElementById("moonImageContainer")
+
+    // Clear existing content
+    container.innerHTML = ""
+
+    if (imageUrl) {
+      const img = document.createElement("img")
+      img.src = imageUrl
+      img.alt = "Monad Character"
+      img.style.opacity = "0"
+      img.style.transition = "opacity 0.5s ease"
+
+      img.onload = () => {
+        img.style.opacity = "1"
+      }
+
+      img.onerror = () => {
+        console.warn("Failed to load moon image:", imageUrl)
+        // Container will show placeholder moon emoji
+      }
+
+      container.appendChild(img)
+    }
+  }
+
+  // Add this method to expose image loading functionality
+  setMoonCharacter(imageUrl) {
+    this.loadMoonImage(imageUrl)
   }
 }
 
