@@ -48,16 +48,6 @@
                                 <div class="grid-lines"></div>
                                 <div class="overlay"></div>
                             </div>
-                            <div class="stats-overlay">
-                                <div class="stat">
-                                    <span class="stat-label">Live TPS</span>
-                                    <span class="stat-value" id="liveTps">0</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="stat-label">Total Transactions</span>
-                                    <span class="stat-value" id="totalTx">0</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <aside class="data-stream-sidebar">
@@ -69,6 +59,25 @@
                             <div class="feed-content" id="dataFeed"></div>
                         </div>
                     </aside>
+                    <div class="live-stats-bar">
+                        <div class="stat-block tps-block">
+                            <div class="stat-label">Live TPS</div>
+                            <div class="stat-value" id="liveTpsValue">0</div>
+                            <div class="tps-gauge">
+                                <div class="tps-gauge-inner" id="tpsGaugeInner"></div>
+                            </div>
+                        </div>
+                        <div class="stat-separator"></div>
+                        <div class="stat-block">
+                            <div class="stat-label">Current Block</div>
+                            <div class="stat-value" id="blockNumberValue">0</div>
+                        </div>
+                        <div class="stat-separator"></div>
+                        <div class="stat-block">
+                            <div class="stat-label">Tx Fees Spent (ETH)</div>
+                            <div class="stat-value" id="txFeesValue">0.0000</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
