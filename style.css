@@ -227,59 +227,7 @@ body {
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(16, 16, 32, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
 }
 
-/* Enhanced Glass Light Sweep Animation */
-.glass-light-sweep {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 3;
-  overflow: hidden;
-}
-
-.light-sweep-element {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    120deg,
-    transparent 0%,
-    transparent 35%,
-    rgba(255, 255, 255, 0.1) 40%,
-    rgba(131, 110, 249, 0.3) 45%,
-    rgba(255, 255, 255, 0.8) 50%,
-    rgba(131, 110, 249, 0.3) 55%,
-    rgba(255, 255, 255, 0.1) 60%,
-    transparent 65%,
-    transparent 100%
-  );
-  animation: glassSweep 3s ease-in-out infinite;
-  transform: rotate(-30deg);
-  opacity: 0;
-}
-
-@keyframes glassSweep {
-  0% {
-    transform: translateX(-100%) rotate(-30deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(100%) rotate(-30deg);
-    opacity: 0;
-  }
-}
-
-/* Transaction Light Animation */
+/* Enhanced Transaction Light with Glass Gloss Effect */
 .transaction-light {
   position: absolute;
   width: 4px;
@@ -289,6 +237,26 @@ body {
   box-shadow: 0 0 10px #ff0080, 0 0 20px rgba(255, 0, 128, 0.5);
   animation: slideUp 2s ease-out forwards;
   z-index: 5;
+  overflow: hidden;
+  position: relative;
+}
+
+.transaction-light::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  transform: rotate(25deg);
+  animation: lightGloss 1.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .transaction-light.medium {
@@ -298,6 +266,15 @@ body {
   box-shadow: 0 0 15px #8000ff, 0 0 30px rgba(128, 0, 255, 0.5);
 }
 
+.transaction-light.medium::before {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0) 70%
+  );
+}
+
 .transaction-light.large {
   width: 8px;
   height: 40px;
@@ -305,11 +282,30 @@ body {
   box-shadow: 0 0 20px #0080ff, 0 0 40px rgba(0, 128, 255, 0.5);
 }
 
+.transaction-light.large::before {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0) 70%
+  );
+}
+
 .transaction-light.supernova {
   width: 12px;
   height: 60px;
   background: linear-gradient(180deg, transparent 0%, #00ffff 30%, #ffffff 50%, #00ffff 70%, transparent 100%);
   box-shadow: 0 0 30px #00ffff, 0 0 60px rgba(0, 255, 255, 0.8), 0 0 90px rgba(255, 255, 255, 0.3);
+}
+
+.transaction-light.supernova::before {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  animation: lightGloss 1s ease-in-out infinite;
 }
 
 @keyframes slideUp {
@@ -333,24 +329,18 @@ body {
   }
 }
 
-/* Enhanced Transaction Surface */
-.transaction-surface {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.02) 0%,
-    rgba(131, 110, 249, 0.05) 25%,
-    rgba(255, 255, 255, 0.02) 50%,
-    rgba(131, 110, 249, 0.05) 75%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  backdrop-filter: blur(1px);
-  border-radius: inherit;
-  z-index: 2;
+@keyframes lightGloss {
+  0% {
+    transform: translateX(-100%) rotate(25deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%) rotate(25deg);
+    opacity: 0;
+  }
 }
 
 /* Vertical lanes for transaction lights */
@@ -372,195 +362,6 @@ body {
   height: 100%;
   background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
   opacity: 0.3;
-}
-
-/* Glass Reflection Effect */
-.glass-reflection {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    transparent 30%,
-    transparent 70%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
-  pointer-events: none;
-  z-index: 4;
-  border-radius: inherit;
-}
-
-/* Enhanced Glass Surface with Multiple Light Sweeps */
-.multi-light-sweep {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 6;
-  overflow: hidden;
-}
-
-.light-sweep-1 {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    120deg,
-    transparent 0%,
-    transparent 40%,
-    rgba(255, 0, 128, 0.2) 45%,
-    rgba(255, 255, 255, 0.6) 50%,
-    rgba(255, 0, 128, 0.2) 55%,
-    transparent 60%,
-    transparent 100%
-  );
-  animation: glassSweep1 4s ease-in-out infinite;
-  transform: rotate(-25deg);
-  opacity: 0;
-}
-
-.light-sweep-2 {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    115deg,
-    transparent 0%,
-    transparent 35%,
-    rgba(128, 0, 255, 0.15) 42%,
-    rgba(255, 255, 255, 0.4) 50%,
-    rgba(128, 0, 255, 0.15) 58%,
-    transparent 65%,
-    transparent 100%
-  );
-  animation: glassSweep2 5s ease-in-out infinite;
-  animation-delay: -2s;
-  transform: rotate(-35deg);
-  opacity: 0;
-}
-
-.light-sweep-3 {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    125deg,
-    transparent 0%,
-    transparent 38%,
-    rgba(0, 128, 255, 0.1) 44%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(0, 128, 255, 0.1) 56%,
-    transparent 62%,
-    transparent 100%
-  );
-  animation: glassSweep3 6s ease-in-out infinite;
-  animation-delay: -4s;
-  transform: rotate(-20deg);
-  opacity: 0;
-}
-
-@keyframes glassSweep1 {
-  0% {
-    transform: translateX(-120%) rotate(-25deg);
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  85% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(120%) rotate(-25deg);
-    opacity: 0;
-  }
-}
-
-@keyframes glassSweep2 {
-  0% {
-    transform: translateX(-130%) rotate(-35deg);
-    opacity: 0;
-  }
-  12% {
-    opacity: 0.8;
-  }
-  88% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateX(130%) rotate(-35deg);
-    opacity: 0;
-  }
-}
-
-@keyframes glassSweep3 {
-  0% {
-    transform: translateX(-110%) rotate(-20deg);
-    opacity: 0;
-  }
-  18% {
-    opacity: 0.6;
-  }
-  82% {
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateX(110%) rotate(-20deg);
-    opacity: 0;
-  }
-}
-
-/* Transaction Trigger Light Sweep */
-.transaction-triggered-sweep {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    120deg,
-    transparent 0%,
-    transparent 30%,
-    rgba(255, 255, 255, 0.2) 40%,
-    rgba(131, 110, 249, 0.6) 45%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(131, 110, 249, 0.6) 55%,
-    rgba(255, 255, 255, 0.2) 60%,
-    transparent 70%,
-    transparent 100%
-  );
-  animation: transactionSweep 1.5s ease-out forwards;
-  transform: rotate(-30deg);
-  opacity: 0;
-  z-index: 7;
-}
-
-@keyframes transactionSweep {
-  0% {
-    transform: translateX(-100%) rotate(-30deg);
-    opacity: 0;
-  }
-  20% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(100%) rotate(-30deg);
-    opacity: 0;
-  }
 }
 
 .stats-overlay {
