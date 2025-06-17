@@ -113,6 +113,7 @@ class MonadVisualizer {
       // Create sliding light animation
       if (this.currentTab === "cityscape") {
         this.createTransactionLight(transaction)
+        this.triggerGlassSweep(transaction)
       }
 
       // Add to data feed
@@ -164,6 +165,26 @@ class MonadVisualizer {
         light.parentNode.removeChild(light)
       }
     }, 2000)
+  }
+
+  triggerGlassSweep(transaction) {
+    // Only trigger special sweep for larger transactions
+    if (transaction.type === "large" || transaction.type === "supernova") {
+      const container = document.querySelector(".data-stream-container")
+
+      // Create triggered sweep element
+      const sweep = document.createElement("div")
+      sweep.className = "transaction-triggered-sweep"
+
+      container.appendChild(sweep)
+
+      // Remove after animation
+      setTimeout(() => {
+        if (sweep.parentNode) {
+          sweep.parentNode.removeChild(sweep)
+        }
+      }, 1500)
+    }
   }
 
   addToDataFeed(transaction) {
