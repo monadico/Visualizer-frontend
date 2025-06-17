@@ -95,18 +95,10 @@ body {
 
 /* Glassmorphism Panel */
 .glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-}
-
-.glass-panel:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }
 
 /* App Container */
@@ -224,7 +216,10 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(16, 16, 32, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }
 
 /* Transaction Container */
@@ -233,7 +228,10 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(16, 16, 32, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }
 
 /* NEW: Styles for the vertical grid lines */
@@ -984,4 +982,209 @@ body {
     gap: 1rem;
     align-items: flex-start;
   }
+}
+
+.main-layout {
+  display: flex;
+  height: 80vh;
+  width: 100%;
+  min-width: 0;
+  background: linear-gradient(120deg, #0e1010 60%, #1a237e 100%);
+  border-radius: 32px;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  gap: 0;
+}
+
+.visualization-area {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.data-stream-sidebar {
+  width: 370px;
+  min-width: 320px;
+  max-width: 420px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 2rem 1rem 2rem 0;
+  box-sizing: border-box;
+  z-index: 2;
+  height: 100%;
+  position: relative;
+  border-left: 1px solid rgba(255,255,255,0.06);
+}
+
+.data-feed.glass-panel {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  background: transparent !important;
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 1rem 1rem 0.5rem 1rem;
+}
+
+.live-indicator {
+  background: #e100ff;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 0.2em 0.8em;
+  margin-left: 0.5em;
+  letter-spacing: 1px;
+}
+
+.feed-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 1rem 1rem 1rem;
+  font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+  font-size: 1rem;
+  color: #ffb3ff;
+}
+
+.feed-item {
+  background: rgba(225, 0, 255, 0.05);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  padding: 0.3rem 0.7rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  letter-spacing: 0.5px;
+}
+
+.feed-item .timestamp {
+  color: #fff;
+  opacity: 0.7;
+  font-size: 0.95em;
+  margin-right: 0.7em;
+}
+
+.feed-item .action {
+  color: #ff3ec9;
+  font-weight: 700;
+  margin-right: 0.7em;
+}
+
+.feed-item .details {
+  color: #fff;
+  font-weight: 400;
+  margin-left: auto;
+}
+
+/* Unify the look of the main layout */
+.main-layout {
+  background: linear-gradient(120deg, #0e1010 60%, #1a237e 100%);
+  border-radius: 32px;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  gap: 0;
+}
+
+/* Remove glass-panel look for integration */
+.glass-panel {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Remove border radius from sidebar and visualization area */
+.visualization-area,
+.data-stream-sidebar {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Optional: subtle divider between main and sidebar */
+.data-stream-sidebar {
+  border-left: 1px solid rgba(255,255,255,0.06);
+  /* Or use a gradient for a softer effect: */
+  /* border-left: none;
+     background: linear-gradient(to left, rgba(255,255,255,0.04) 1px, transparent 40px); */
+}
+
+/* Make sure the stats overlay also blends in */
+.stats-overlay.glass-panel {
+  background: rgba(30, 30, 50, 0.7) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* Remove extra padding/margin from feed header/content for alignment */
+.feed-header {
+  padding-top: 1.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0;
+}
+
+.data-feed.glass-panel {
+  padding: 0;
+  margin: 0;
+  background: transparent !important;
+}
+
+.visualization-area,
+.data-stream-sidebar {
+  background: transparent !important;
+}
+
+/* Unified background for both areas */
+.main-layout {
+  background: linear-gradient(120deg, #0e1010 60%, #1a237e 100%);
+}
+
+/* Make both areas transparent so the parent background shows through */
+.visualization-area,
+.data-stream-sidebar {
+  background: transparent !important;
+}
+
+/* Remove background from the data stream panel */
+.data-feed.glass-panel {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Optional: subtle divider */
+.data-stream-sidebar {
+  border-left: 1px solid rgba(255,255,255,0.06);
+}
+
+.data-stream-container,
+.transaction-container {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }

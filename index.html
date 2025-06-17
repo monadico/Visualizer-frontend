@@ -41,30 +41,34 @@
 
         <main class="main-content">
             <div id="cityscape" class="page active">
-                <div class="data-stream-container glass-panel">
-                    <div class="transaction-container">
-                        <div class="grid-lines"></div>
-                        <div class="overlay"></div>
-                    </div>
-                    
-                    <div class="stats-overlay glass-panel">
-                        <div class="stat">
-                            <span class="stat-label">Live TPS</span>
-                            <span class="stat-value" id="liveTps">0</span>
+                <div class="main-layout">
+                    <div class="visualization-area">
+                        <div class="data-stream-container">
+                            <div class="transaction-container">
+                                <div class="grid-lines"></div>
+                                <div class="overlay"></div>
+                            </div>
+                            <div class="stats-overlay">
+                                <div class="stat">
+                                    <span class="stat-label">Live TPS</span>
+                                    <span class="stat-value" id="liveTps">0</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Total Transactions</span>
+                                    <span class="stat-value" id="totalTx">0</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat">
-                            <span class="stat-label">Total Transactions</span>
-                            <span class="stat-value" id="totalTx">0</span>
-                        </div>
                     </div>
-                    
-                    <div class="data-feed glass-panel">
-                        <div class="feed-header">
-                            <span>Data Stream</span>
-                            <span class="live-indicator">LIVE</span>
+                    <aside class="data-stream-sidebar">
+                        <div class="data-feed glass-panel">
+                            <div class="feed-header">
+                                <span>Data Stream</span>
+                                <span class="live-indicator">LIVE</span>
+                            </div>
+                            <div class="feed-content" id="dataFeed"></div>
                         </div>
-                        <div class="feed-content" id="dataFeed"></div>
-                    </div>
+                    </aside>
                 </div>
             </div>
 
